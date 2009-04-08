@@ -1,13 +1,6 @@
 require 'xmpp4r/client'
 require 'xmpp4r/roster/helper/roster'
 
-=begin
-todo:
-do presence callback
-and each fuction for precence
-
-
-=end
 
 class JabberClient
 public
@@ -24,15 +17,17 @@ public
 		@test_cout=0
 		
 	end
+	#dev-status: in work, but works
 	def fullInit
-		#not realised!!!!!
 		p 'JabberClient.fullInit'
 		setIncomingMessagesCallback
 		setRoster
 		setPresenceCallback
 		#setUpdateCallback
 	end
+	##
 	#return true/false, and string error
+	#dev-status: in work, but wokrs
 	def connect
 		#no tested!!!
 		p 'JabberClient.connect'
@@ -45,6 +40,7 @@ public
 		end
 	end
 	
+	##
 	#End of session
 	def closeConnection
 		p 'JabberClient.closeConnection'
@@ -53,7 +49,7 @@ public
 	
 	def setStatus(a_show=nil, a_status=nil, a_priority=nil)
 		p 'JabberClient.setStatus'
-		a_show=nil if a_show=:online
+		a_show=nil if a_show==:online
 		presence=Jabber::Presence.new(a_show, a_status,a_priority)
 		@client.send(presence)
 	end
@@ -75,14 +71,17 @@ public
 	end
 	
 	def delContact(a_jid)
-		jid=Jabber::JID(a_jid)
+		jid=Jabber::JID.new(a_jid)
 		rosterItem=@roster.find(jid)
 		rosterItem.remove
 	end
 
 	def eachIncomingMessages(&a_closure)
-		@queueMessages.each{|msg|
-			a_closure.call(msg.from.to_s,msg.type,msg.body)
+		@queueMessages.each{|msgAndTime|
+			msg=msgAndTime[0]
+			time=msgAndTime[1]
+			
+			a_closure.call(msg.from.to_s,msg.type,msg.body,msg.subject,time)
 		}
 		@queueMessages.clear
 	end
@@ -95,7 +94,7 @@ public
 		}
 	end
 	
-	#fail
+	
 	def eachPresences(&a_closure)
 		@queuePresences.each{|presence|
 			item=presence[0]
@@ -129,25 +128,28 @@ public
 	end
 	
 private
-	#dev-status:in_work
+	#
 	def setIncomingMessagesCallback
 		p "JabberClient.setIncomingMessagesCallback---start"
 		@client.add_message_callback{|msg|
+			
 			p "msg="+ msg.body+"\n"
-			@queueMessages.push(msg)
+			@queueMessages.push([msg,Time.now])
 			p "after\n"
 		}
 		p "JabberClient.setIncomingMessagesCallback---end"
 	end
 
-	#
+	##
+	#Loading roster from jabber-server and set him
 	def setRoster
 		@roster=Jabber::Roster::Helper.new(@client)
 		@roster.wait_for_roster
 	end
 	
-	#fail
-	#only known RosterItem
+	##
+	#Add a callback for presence updates 
+	#only know item in roster
 	def setPresenceCallback
 		p 'JabberClient.setPresenceCallback'
 		@roster.add_presence_callback{|item,old,new|
@@ -156,6 +158,7 @@ private
 		}
 	end
 
+	#not realised!!!
 	def setUpdateCallback
 		@roster.add_update_callback{|old,new|
 			p 'update callback'
@@ -163,19 +166,20 @@ private
 			p 'new'+new.to_s
 		}
 	end
-
+	
+	#not realised!!!
 	def setRosterQueryCallback
-		#@client.
+		#empty
 	end
 
 	@server
 	@pass
 	@port
 	
-	@test_cout
+	@test_cout	#variable for test
 
 	@roster
 	@client
-	@queueMessages
+	@queueMessages #format: [[msg,time],[msg2,time2],...]
 	@queuePresences	#format: [[item,old,new] ,[item2,old2,new2],...]
 end

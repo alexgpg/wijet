@@ -5,8 +5,9 @@ require '../works/jabber_client'
 
 def printMessages
 	p 'printMessages'
-	$jc.eachIncomingMessages{|from,type,text|
-		puts "----msg="+from+","+text
+	$jc.eachIncomingMessages{|from,type,text,subject,time|
+		subject='' if subject.nil?
+		puts "["+time.to_s+":"+from+"]"+text+"[type:"+type.to_s+",sub="+subject+"]"
 	}
 end
 
@@ -36,12 +37,12 @@ end
 	$jc.setStatus(:xa,"test_status",40)
 
 	#$jc.addContact("test@jabber.port13.lan")
-	$jc.delContact("test@jabber.port13.lan")
+	#$jc.delContact("test@jabber.port13.lan")
 	
 	trap("INT"){
-		#printMessages
+		printMessages
 		#printRoster
-		printPresences
+		#printPresences
 		exit
 	}
 
