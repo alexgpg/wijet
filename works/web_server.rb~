@@ -5,7 +5,6 @@ require '../moc_classes/moc_parsed_info'
 require '../moc_classes/moc_client'
 require '../works/client_manager'
 
-##
 #Allow acces from web
 class WebServer
 	#ctor
