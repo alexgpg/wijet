@@ -116,13 +116,13 @@ class Client
 	def initilalize(a_jid, a_password, a_server, a_port)
 	end
 	#Тоже создание клиента, только в качестве параметра передается хеш, для удобства
-	def initialize(a_params)
+	def initialize(a_hashAgrs)
 	end
 	#Выполнение запроса клиента
 	#Возвращает объект типа ParsedInfo, в котором хранится информация которую надо отправить клиенту.
 	#Ему передается объект типа parsedInfo в котором содержится распарсенный запрос клиента
 	#Сам метод взаимодействует через объект executerRequets.
-	def runRequet(a_parsedInfo)
+	def runRequest(a_parsedRequest)
 	end
 	
 	#Возращает @jabberClient

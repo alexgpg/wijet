@@ -6,7 +6,7 @@ require '../moc_classes/moc_executer_request'
 class Client
 	def initialize(a_hashArgs={})
 		p 'Client.new #hash arg'
-		@jabberClient=JabberClient.new(a_hashArgs[:jid],a_hashArgs[:password],a_hashArgs[:server],a_hashArgs[:port])
+		@jabber_client=JabberClient.new(a_hashArgs[:jid],a_hashArgs[:password],a_hashArgs[:server],a_hashArgs[:port])
 		@auth=AuthInfo.new
 	end
 

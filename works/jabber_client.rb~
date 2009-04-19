@@ -35,9 +35,8 @@ public
 		begin
 		@client.connect(@server,@port)
 		@client.auth(@pass)
-		return true,""
 		rescue Jabber::ClientAuthenticationFailure
-			rescue :wrongPassword
+			raise :wrongPassword
 		end
 	end
 	
