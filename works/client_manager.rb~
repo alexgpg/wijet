@@ -37,7 +37,7 @@ class ClientManager
 		p 'ClientManager.[]'
 		return @clients[a_sessionId]
 	end
-
+	#not realised!!!!!
 	def delNoActiveClients
 		p 'ClientManager.delNoActiveClients'
 		#empty
