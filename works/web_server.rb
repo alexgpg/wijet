@@ -48,14 +48,16 @@ private
 			server=parsed.server
 			
 			maybeNewClient=Client.new(jid, pass, server, 5222)
+			#no work with new specks!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			#no tested!!!!!!!!!!!!!!!!!
 			begin
 				maybeNewCLient.connect
 				#login successfully
 				sid=ClientManager.instance.addClient(maybeNewClient)
-				response.boby="{succes:true, sid:\"#{sid}\"}"
+				response.boby=Parser.toJsonForLogin(ParsedInfo.loginSuccessfully(sid))
 			rescue	#todo
 				#connect failed
-				response.body="{succes:true, sid:error!!!}"
+				response.boby=Parser.toJsonForLogin(ParsedInfo.loginFailed("error_text"))
 			end
 			}
 	end

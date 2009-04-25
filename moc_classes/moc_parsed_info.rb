@@ -25,6 +25,16 @@ class ParsedInfo
 		return '11111111'
 	end
 
+	def ParsedInfo.loginFailed(a_error)
+		return nil
+	end
+
+
+	def ParsedInfo.loginSuccessfully(a_sid)
+		return nil
+	end
+
+
 	def data=(a_data)
 		@data=a_data
 	end

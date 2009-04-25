@@ -76,6 +76,18 @@ class ParsedInfo
 	def pass
 	end
 
+	#Возвращает объект-ответ на запрос логина в случае _неудачи_
+	#a_error:: [String] text error
+	#result:: [ParsedInfo]
+	def ParsedInfo.loginFailed(a_error)
+	end
+
+	#Возвращает объект-ответ на запрос логина в случае удачи
+	#a_sid:: [String] session_id
+	#result:: [ParsedInfo]
+	def ParsedInfo.loginSuccessfully(a_sid)
+	end
+
 	#Записать данные
 	def data=(a_data)
 	#Получить данные (в формате стандартных типов руби)
