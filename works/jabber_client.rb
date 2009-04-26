@@ -6,7 +6,11 @@ class JabberClient
 public
 	#ctor
 	def initialize(a_jid, a_pass, a_server, a_port)
-		p 'JabberClient.new'
+		p '!JabberClient.new'
+# 		jid=Jabber::JID(a_jid)
+# 		jid.resource='Wijet'
+		#костыль!!!!!!!!!!!!!
+		a_jid+='/Wijet'
 		@client=Jabber::Client.new(a_jid)
 		@pass=a_pass
 		@server=a_server
@@ -23,6 +27,7 @@ public
 		setIncomingMessagesCallback
 		setRoster
 		setPresenceCallback
+		setStatus(:online,"test_status",40)	#!!!!!!!!!!!!!!!!!!!!!!!!!11
 		#setUpdateCallback
 	end
 	

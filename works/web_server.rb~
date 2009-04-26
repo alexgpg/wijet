@@ -1,8 +1,7 @@
 require 'webrick'
 
-require '../moc_classes/moc_parser'
-require '../moc_classes/moc_parsed_info'
-require '../moc_classes/moc_client'
+require '../works/parser'
+require '../works/client'
 require '../works/client_manager'
 
 ##
@@ -11,7 +10,7 @@ class WebServer
 	#ctor
 	def initialize
 		p "WebServer.new"
-		@server=WEBrick::HTTPServer.new(:DocumentRoot=>'../moc_web',:Port=>3000)	#moc_root!!!!
+		@server=WEBrick::HTTPServer.new(:DocumentRoot=>'../works_web',:Port=>3000)	#moc_root!!!!
 		mountLoginCgi
 		mountImCgi
 		@parser=Parser.new
@@ -40,33 +39,51 @@ private
 		p "WebServer.mountLoginCgi"
 		#no_work!!!!no tested!!!!
 		@server.mount_proc("/login.cgi"){|request,response|
-			
-			response['Content-Type'] = 'text/html'
-			parsed=@parser.parseFromLogin(request.body["keywords"])
+			begin
+			parsed=@parser.parseFromLogin(request.body)
 			jid=parsed.jid
 			pass=parsed.pass
 			server=parsed.server
-			
-			maybeNewClient=Client.new(jid, pass, server, 5222)
+					
+
+			maybeNewClient=Client.new(
+				:jid	  => jid,
+				:password =>  pass,
+				:server   =>  "jabber.ru",
+				:port     =>  5222)
 			#no work with new specks!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			#no tested!!!!!!!!!!!!!!!!!
-			begin
-				maybeNewCLient.connect
+			response['Content-Type']='text/html'
+				maybeNewClient.connect
 				#login successfully
 				sid=ClientManager.instance.addClient(maybeNewClient)
-				response.boby=Parser.toJsonForLogin(ParsedInfo.loginSuccessfully(sid))
+				puts "SIDDDDDDDDDDDDDD="+sid.to_s
+				puts "OBJECT===="+ParsedInfo.loginSuccessfully(sid.to_s).inspect
+				answer=response.body=@parser.toJsonForLogin(ParsedInfo.loginSuccessfully(sid))
+				puts "ANSWER===="+answer
 			rescue	#todo
 				#connect failed
-				response.boby=Parser.toJsonForLogin(ParsedInfo.loginFailed("error_text"))
-			end
+				response.body=@parser.toJsonForLogin(ParsedInfo.loginFailed("error_text"))
+			end			
 			}
 	end
 	def mountImCgi
 		#It is not realised!!!
 		p "WebServer.mountImCgi"
 		@server.mount_proc("/im.cgi"){|request,response|
-			response['Content-Type'] = 'text/html'
-			response.body='empty'
+ 			response['Content-Type'] = 'text/html'
+			parsedReq=@parser.parseFromIm(request.body)
+			sid=parsedReq.sessionId
+			curClient=ClientManager.instance[sid]
+			if curClient.nil?
+				response.body="error: wrong session id"
+			else
+				parsedResp=curClient.runRequest(parsedReq)
+				response.body=@parser.toJsonForIm(parsedResp)
+			end
+# 				{"session_id":"test_sid_-967240980","additional_query":{"send_message":[{"to":"killer@jabber.port13.lan","type":"chat","text":""}]}}
+			
+
 		}
 	end
 	@server
