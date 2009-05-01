@@ -1,5 +1,7 @@
-require 'xmpp4r/client'
-require 'xmpp4r/roster/helper/roster'
+
+require '../works/requirer'
+requireWithGems 'xmpp4r/client'
+requireWithGems 'xmpp4r/roster/helper/roster'
 
 
 class JabberClient

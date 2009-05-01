@@ -1,5 +1,5 @@
-
-require 'json'
+require '../works/requirer'
+requireWithGems 'json'
 require '../works/parsed_info'
 
 class Parser
