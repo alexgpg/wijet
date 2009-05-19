@@ -2,50 +2,49 @@
 !#
 
 require '../works/jabber_client'
-require 'test/unit'
 
+def printMessages
+	p 'printMessages'
+	$jc.eachIncomingMessages{|from,type,text,subject,time|
+		subject='' if subject.nil?
+		puts "["+time.to_s+":"+from+"]"+text+"[type:"+type.to_s+",sub="+subject+"]"
+	}
+end
 
-#class fo testing class JabberClient
-class Jc_test < Test::Unit::TestCase
-	def test_simple
-		#true connect
-		client=JabberClient.new("killer@jabber.port13.lan","ntfsUTF8","jabber.port13.lan",5222)
-		res=client.connect
-		print 'res='+res.inspect
-		assert_equal(res[0],true,"connect test")
-		client.closeConnection
-		#end
-		#failure connect (incorrect password)
-		client=JabberClient.new("killer@jabber.port13.lan","88","jabber.port13.lan",5222)
-		res=client.connect
-		print 'res='+res.inspect
-		assert_equal(res[0],false,"connect test with left password")
-		#status test
-		client=JabberClient.new("killer@jabber.port13.lan/132","ntfsUTF8","jabber.port13.lan",5222)
-		res=client.connect
-		assert_equal(res[0],true,"connect test222")
-		client.setStatus(:xa,"test_status",-127)
-		#client.closeConnection
-		#end
-		#sending messages
-		#client.sendMessage("killer@jabber.port13.lan","normal message1",:normal,"subj")
-		#client.sendMessage('killer@jabber.port13.kan',"chat   message", :chat)
-		client.fullInit
-		client.sendChatMessage('killer@jabber.port13.lan',"chat   message")
-=begin
-		trap("INT"){ 	puts "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-				client.eachIncomingMessages{|from,text|
-				puts from+':'+text
-			}
-			client.closeConnection()
-		}
-=end
-		Thread.stop
-		client.closeConnection()
-		#end
-	end
+def printRoster
+	p "ROSTER"
+	$jc.eachJIDinRoster{|group, jid,name|
+		if group.nil?; group='';end
+		if name.nil?; name=jid;end
+		puts "gr="+group+","+jid+","+name
+	}
 
 end
 
+def printPresences
+	p 'printPresences'
+	$jc.eachPresences{|jid,newShow,newStatus,oldShow,oldStatus|
+		puts "pres.new.jid="+jid+",type="+newShow.to_s+",status="+newStatus
+		puts "pres.old.jid="+jid+",type="+oldShow.to_s+",status"+oldStatus
+	}
+end
 
+	$jc=JabberClient.new("test@jabber.port13.lan/321","123456","jabber.port13.lan",5222)
+	$jc.connect
+	$jc.fullInit
+	#$jc.sendChatMessage("test@jabber.port13.lan","1111111")
+	#$jc.sendMessage("test@jabber.port13.lan","месага",:normal, "тема")
+	$jc.setStatus(:xa,"test_status",40)
+
+	#$jc.addContact("test@jabber.port13.lan")
+	#$jc.delContact("test@jabber.port13.lan")
+	
+	trap("INT"){
+		printMessages
+		#printRoster
+		#printPresences
+		exit
+	}
+
+	Thread.stop
 

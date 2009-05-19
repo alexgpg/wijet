@@ -2,6 +2,7 @@
 #!
 
 require '../works/client_manager'
+require '../moc_classes/client'
 require 'test/unit'
 
 
@@ -14,7 +15,7 @@ class TestClientManager < Test::Unit::TestCase
 		#end
 	
 		#adding correct test
-		newClient=Client.new("jid@jid.ru","password","server.org")
+		newClient=Client.new(:jid => "jid@jid.ru",:passowrd => "password",:server => "server.org", :port => 5222)
 		sid=cm.addClient(newClient)
 		assert_equal(newClient,cm[sid],"adding correct test")
 		#end
@@ -25,10 +26,11 @@ class TestClientManager < Test::Unit::TestCase
 		#end
 
 		#test adding and clearing
-		client1=Client.new("jid1@jid.ru", "pass", "server.org")
-		client2=Client.new("jid2@jid.ru", "pass", "server.org")
-		client3=Client.new("jid3@jid.ru", "pass", "server.org")
-		client4=Client.new("jid4@jid.ru", "pass", "server.org")
+		client1=Client.new(:jid => "jid1@jid.ru",:passowrd => "pass",:server => "server.org", :port => 5222)
+		client2=Client.new(:jid => "jid2@jid.ru",:passowrd => "pass",:server => "server.org", :port => 5222)
+		client3=Client.new(:jid => "jid3@jid.ru",:passowrd => "pass",:server => "server.org", :port => 5222)
+		client4=Client.new(:jid => "jid4@jid.ru",:passowrd => "pass",:server => "server.org", :port => 5222)
+
 		sid1=ClientManager.instance.addClient(client1)
 		sid2=ClientManager.instance.addClient(client2)
 		assert_equal(client1,ClientManager.instance[sid1],"1")

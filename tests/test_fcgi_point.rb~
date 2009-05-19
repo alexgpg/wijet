@@ -1,0 +1,4 @@
+#!/usr/bin/ruby1.8
+
+system("cgi-fcgi","-start", "-connect", ":3000", "../works/web_io.fcgi")
+

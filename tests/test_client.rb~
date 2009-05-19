@@ -11,7 +11,7 @@ class TestClient < Test::Unit::TestCase
 				:password =>  "123456",
 				:server   =>  "jabber.port13.lan",
 				:port     =>  5222)
-		client.connect
+		assert_nothing_raised{client.connect}
 	end
 
 	def test_2
