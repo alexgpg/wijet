@@ -1,20 +1,14 @@
 require '../works/requirer'
 requireWithGems 'json'
-require '../works/parsed_info'
+require '../works/json_object'
 
 class Parser
 	def initialize
-		p 'Parser.new'
+# 		p 'Parser.new'
 	end
-	def parseFromLogin(a_request)
+	def parse(a_request)
 		data=JSON.parse a_request
-		res=ParsedInfo.new
-		res.data=data
-		return res
-	end
-	def parseFromIm(a_request)
-		data=JSON.parse a_request
-		res=ParsedInfo.new
+		res=JsonObject.new
 		res.data=data
 		return res
 	end

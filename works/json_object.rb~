@@ -12,6 +12,7 @@ class JsonObject
 	end
 	
 	def server
+		#todo: убрать эту херь
 		return "81.91.180.150"
 	end
 
@@ -24,15 +25,15 @@ class JsonObject
 		return @data['session_id']
 	end
 
-	def ParsedInfo.loginFailed(a_error)
-		res=ParsedInfo.new
+	def JsonObject.loginFailed(a_error)
+		res=JsonObject.new
 		res.data={"session_id" => "null"}
 		return res
 	end
 
 
 	def JsonObject.loginSuccessfully(a_sid)
-		res=ParsedInfo.new
+		res=JsonObject.new
 		res.data={"session_id" => a_sid}
 		return res
 	end

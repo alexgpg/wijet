@@ -1,0 +1,19 @@
+#!/usr/bin/ruby1.8
+require "fcgi"
+
+class FastCGIPoint
+	def initialize
+		@point=Proc.new do |request|
+			stuff=request.in.read
+			out = request.out
+# 			out.print "Content-Type: text/html\r\n\r\nHello, World!\n"
+			out << "Content-Type: text/html\r\n\r\n"
+			out << "---------------------------------\n"
+			out << stuff
+			request.finish
+		end
+	end
+
+	@point
+end
+

@@ -1,4 +1,3 @@
-require '../moc_classes/moc_client'
 require 'singleton'
 
 #Note:sid aka sessionId
