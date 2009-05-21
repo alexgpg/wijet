@@ -20,12 +20,66 @@ class TestExecuter < Test::Unit::TestCase
 # 		p parsed.inspect
 		assert_equal(ExecuterRequest.instance.typeRequest(parsed),:work)
 	end
-
+=begin
 	def test_1
+		p 'test1'
 		parser=Parser.new
-		str='[{"name":"jid","value":"test@jabber.port13.lan"},{"name":"pass","value":"123456"}]'
+# 		str='[{"name":"jid","value":"test@jabber.port13.lan"},{"name":"pass","value":"123456"}]'
+		str='[{"name":"jid","value":"wijet@jabber.ru"},{"name":"pass","value":"pivopivo"}]'
 		parsed=parser.parse(str)
 		assert_equal(ExecuterRequest.instance.typeRequest(parsed),:login)
-		ExecuterRequest.instance.execute(parsed)
+		answer=ExecuterRequest.instance.execute(parsed)
+		p 'answer='+answer.inspect + '\n'
+	end
+=end
+=begin
+	def test_2
+		p 'test1'
+		parser=Parser.new
+# 		str='[{"name":"jid","value":"test@jabber.port13.lan"},{"name":"pass","value":"123456"}]'
+		str='[{"name":"jid","value":"wijet@jabber.ru"},{"name":"pass","value":"huinya"}]'
+		parsed=parser.parse(str)
+		assert_equal(ExecuterRequest.instance.typeRequest(parsed),:login)
+		begin
+			answer=ExecuterRequest.instance.execute(parsed)
+			p 'answer='+answer.inspect + '\n'
+		rescue
+			p 'aaaaaaaaaaaaa'
+		end
+	end
+=end
+=begin
+	def test_2
+		p 'test2'
+		parser=Parser.new
+		loginStr='[{"name":"jid","value":"test@jabber.port13.lan"},{"name":"pass","value":"123456"}]'
+		parsedReq=parser.parse(loginStr)
+		assert_equal(ExecuterRequest.instance.typeRequest(parsedReq),:login)
+		answer=ExecuterRequest.instance.execute(parsedReq)
+		p 'answer='+answer.inspect + '\n'
+		sid=answer.sessionId
+		workStr='{ "session_id":"'+ sid + '","additional_query": { "send_message": [ { "to": "killer@jabber.port13.lan", "type": "chat", "text": "test"} ],"new_contact": "", "delete_contact": "","change_status": { "show": "", "status": ""},"get_avatars": true} }'
+		parsedReq=parser.parse(workStr)
+		assert_equal(ExecuterRequest.instance.typeRequest(parsedReq),:work)
+		answer=ExecuterRequest.instance.execute(parsedReq)
+		p 'answer='+answer.inspect + '\n'
+# 		Thread.stop
+	end
+=end
+	def test_2
+		p 'test2'
+		parser=Parser.new
+		loginStr='[{"name":"jid","value":"wijet@jabber.ru"},{"name":"pass","value":"pivopivo"}]'
+		parsedReq=parser.parse(loginStr)
+		assert_equal(ExecuterRequest.instance.typeRequest(parsedReq),:login)
+		answer=ExecuterRequest.instance.execute(parsedReq)
+		p 'answer='+answer.inspect + '\n'
+		sid=answer.sessionId
+		workStr='{ "session_id":"'+ sid + '","additional_query": {} }'
+		parsedReq=parser.parse(workStr)
+		assert_equal(ExecuterRequest.instance.typeRequest(parsedReq),:work)
+		answer=ExecuterRequest.instance.execute(parsedReq)
+		p 'answer='+answer.inspect + '\n'
+ 		Thread.stop
 	end
 end

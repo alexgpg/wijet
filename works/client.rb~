@@ -16,7 +16,7 @@ class Client
 
 	def runRequest(a_parsedRequest)
 		p 'Client.runRequest'
-		return @@executerRequest.run(a_parsedRequest,@jabberClient)
+		ExecuterRequest.instance.run(a_parsedRequest,@jabberClient)
 	end
 	
 	def jabberClient
@@ -32,6 +32,5 @@ class Client
 	@jabberClient
 	@auth
 	
-	@@executerRequest=ExecuterRequest.new
 end
 

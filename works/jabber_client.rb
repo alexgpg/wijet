@@ -8,7 +8,7 @@ class JabberClient
 public
 	#ctor
 	def initialize(a_jid, a_pass, a_server, a_port)
-		p '!JabberClient.new'
+# 		p '!JabberClient.new'
 # 		jid=Jabber::JID(a_jid)
 # 		jid.resource='Wijet'
 		#костыль!!!!!!!!!!!!!
@@ -25,7 +25,7 @@ public
 	end
 	#dev-status: in work, but works
 	def fullInit
-		p 'JabberClient.fullInit'
+# 		p 'JabberClient.fullInit'
 		setIncomingMessagesCallback
 		setRoster
 		setPresenceCallback
@@ -38,42 +38,48 @@ public
 	#Can throw exception
 	def connect
 		#no tested!!!
-		p 'JabberClient.connect'
-		begin
-		@client.connect(@server,@port)
-		@client.auth(@pass)
-		rescue Jabber::ClientAuthenticationFailure
-			raise :wrongPassword
-		end
+# 		p 'JabberClient.connect'
+ 		begin
+# 			if @server==nil
+				@client.connect
+# 			else
+# 				@client.connect(@server,@port)
+# 			end
+			@client.auth(@pass)
+			
+ 		rescue Jabber::ClientAuthenticationFailure => e
+ 			raise "login_error"
+# 			p 'JabberClient.faile'
+ 		end
 	end
 	
 	##
 	#End of session
 	def closeConnection
-		p 'JabberClient.closeConnection'
+# 		p 'JabberClient.closeConnection'
 		@client.close
 	end
 	
 	def setStatus(a_show=nil, a_status=nil, a_priority=nil)
-		p 'JabberClient.setStatus'
+# 		p 'JabberClient.setStatus'
 		a_show=nil if a_show==:online
 		presence=Jabber::Presence.new(a_show, a_status,a_priority)
 		@client.send(presence)
 	end
 	
 	def sendMessage(a_to,a_text,a_type,a_subject=nil)
-		p 'JabberClient.sendMessage'
+# 		p 'JabberClient.sendMessage'
 		msg=Jabber::Message.new(a_to,a_text).set_type(a_type).set_subject(a_subject)
 		@client.send(msg)	
 	end
 	#Syntax sugar for sendMessage(to,text,:chat)
 	def sendChatMessage(a_to, a_text)
-		p 'JabberClient.sendChatMessage'
+# 		p 'JabberClient.sendChatMessage'
 		sendMessage(a_to,a_text,:chat)
 	end
 	
 	def addContact(a_jid, a_nick=nil, a_subscribe=false)
-		p 'JabberClient.addContact'
+# 		p 'JabberClient.addContact'
 		@roster.add(a_jid,a_nick,a_subscribe)
 	end
 	
@@ -137,14 +143,14 @@ public
 private
 	#
 	def setIncomingMessagesCallback
-		p "JabberClient.setIncomingMessagesCallback---start"
+# 		p "JabberClient.setIncomingMessagesCallback---start"
 		@client.add_message_callback{|msg|
 			
-			p "msg="+ msg.body+"\n"
+# 			p "msg="+ msg.body+"\n"
 			@queueMessages.push([msg,Time.now])
-			p "after\n"
+# 			p "after\n"
 		}
-		p "JabberClient.setIncomingMessagesCallback---end"
+# 		p "JabberClient.setIncomingMessagesCallback---end"
 	end
 
 	##
@@ -158,7 +164,7 @@ private
 	#Add a callback for presence updates 
 	#only know item in roster
 	def setPresenceCallback
-		p 'JabberClient.setPresenceCallback'
+# 		p 'JabberClient.setPresenceCallback'
 		@roster.add_presence_callback{|item,old,new|
 			#p 'JabberClient.presence_callback'
 			@queuePresences.push([item,new,old])
@@ -168,9 +174,9 @@ private
 	#not realised!!!
 	def setUpdateCallback
 		@roster.add_update_callback{|old,new|
-			p 'update callback'
-			p 'old='+old.to_s
-			p 'new'+new.to_s
+# 			p 'update callback'
+# 			p 'old='+old.to_s
+# 			p 'new'+new.to_s
 		}
 	end
 	
