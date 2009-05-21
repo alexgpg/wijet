@@ -51,7 +51,31 @@ class ExecuterRequest
 		end
 	end
 
-	
+	def sendFullRoster(a_jabberClient)
+		res=[]
+		a_jabberClient.eachJIDinRoster{|group,jid,nick|
+			nick=jid if nick==nil
+			res.push({'jid' => jid, 'nick' => nick })
+		}
+		return res
+	end
+
+	def getRoster(a_additionalQuery,a_jabberClient)
+		if a_additionalQuery['get_roster']
+			return sendFullRoster(a_jabberClient)
+		end
+	end
+
+
+	def getIncomingMessages(a_jabberClient)
+		res=[]
+		a_jabberClient.eachIncomingMessages{ |from,type,msg,subj,time|
+			p 'msg'
+ 			res.push({'from'=>from,'type'=>type,'text'=>msg})
+ 		}
+# 		p 'getIncomingMessages:' + res.inspect
+		return res
+	end
 
 	def loginExec(a_request)
 #  		p 'ExecuterRequest.loginExec'
@@ -75,9 +99,17 @@ class ExecuterRequest
 	end
 
 
-	def sendMessages(a_msgArray,a_jabberClient)
-		a_msgArray.each{|msg|
-			p 'msg='+msg.inspect
+	def sendMessages(a_additionalQuery,a_jabberClient)
+		
+		unless a_additionalQuery['send_message']
+# 			p 'tras1='+a_additionalQuery.inspect
+			return
+		end
+#  		p 'sendMessages'
+		msgArray=a_additionalQuery['send_message']
+		
+		msgArray.each{|msg|
+# 			p 'msg='+msg.inspect
 			a_jabberClient.sendChatMessage(msg['to'],msg['text'])
 # 			a_jabberClient.sendChatMessage('alexgpg@ya.ru','test')
 		}
@@ -98,6 +130,13 @@ class ExecuterRequest
 		
 		jabberClient=ClientManager.instance[sid].jabberClient
 		
+# 		unless jabberClient.rosterSend?
+#			p 'sendFullRoster '+ sendFullRoster(jabberClient).inspect
+# 			res.data['new_contacts']=sendFullRoster(jabberClient)
+# 			p 'new_contacts='+res.data['new_contacts'].inspect
+# 			jabberClient.rosterIsSend
+# 		end
+
 		additional_query=a_request.data['additional_query']
 		unless additional_query=={}
 			unless additional_query['session_close']==nil
@@ -105,18 +144,30 @@ class ExecuterRequest
 				ClientManager.instance.delClient(sid)
 				return res
 			end
-			messages=additional_query['send_message']
-			sendMessages(messages,jabberClient)
-			res.data={"messages" => [],"status_change" => []}
+
+			res.data['new_contacts']=getRoster(additional_query,jabberClient)
+
+			sendMessages(additional_query,jabberClient)
+			res.data["messages"] = []
+			res.data["status_change"] = []
 		end
- 		res.data={"messages" => [],"status_change" => []}
- 		jabberClient.eachIncomingMessages{ |from,type,msg,subj,time|
- 			res.data['messages'].push({'from'=>from,'type'=>type,'text'=>msg})
- 		}
+  		res.data["messages"] = []
+# 		res.data['messages']=getIncomingMessages(jabberClient)
+		res.data["status_change"] = []
+# 		p 'prev'
+
+#		begin::work code
+  		jabberClient.eachIncomingMessages{ |from,type,msg,subj,time|
+# 			p 'msg'
+  			res.data['messages'].push({'from'=>from,'type'=>type,'text'=>msg})
+  		}
 		return res
-		rescue
-			res.data={"ERROR:"=>"xz"}
-			return res
+# 		end
+
+
+# 		rescue
+#  			res.data={"ERROR:"=>'xz'}
+#  			return res
 		end
 		
 	end

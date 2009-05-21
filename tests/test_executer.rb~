@@ -66,6 +66,7 @@ class TestExecuter < Test::Unit::TestCase
 # 		Thread.stop
 	end
 =end
+=begin
 	def test_2
 		p 'test2'
 		parser=Parser.new
@@ -76,6 +77,22 @@ class TestExecuter < Test::Unit::TestCase
 		p 'answer='+answer.inspect + '\n'
 		sid=answer.sessionId
 		workStr='{ "session_id":"'+ sid + '","additional_query": {} }'
+		parsedReq=parser.parse(workStr)
+		assert_equal(ExecuterRequest.instance.typeRequest(parsedReq),:work)
+		answer=ExecuterRequest.instance.execute(parsedReq)
+		p 'answer='+answer.inspect + '\n'
+ 		Thread.stop
+	end
+=end
+	def test_3
+		parser=Parser.new
+		loginStr='[{"name":"jid","value":"wijet@jabber.ru"},{"name":"pass","value":"pivopivo"}]'
+		parsedReq=parser.parse(loginStr)
+		assert_equal(ExecuterRequest.instance.typeRequest(parsedReq),:login)
+		answer=ExecuterRequest.instance.execute(parsedReq)
+		p 'answer='+answer.inspect + '\n'
+		sid=answer.sessionId
+		workStr='{ "session_id":"'+ sid + '","additional_query": {"get_roster": "true", "send_message": [ { "to": "alexgpg@ya.ru", "type": "chat", "text": "test" }]}}'
 		parsedReq=parser.parse(workStr)
 		assert_equal(ExecuterRequest.instance.typeRequest(parsedReq),:work)
 		answer=ExecuterRequest.instance.execute(parsedReq)

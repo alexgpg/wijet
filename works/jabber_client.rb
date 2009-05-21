@@ -20,6 +20,8 @@ public
 		@queueMessages=[]
 		@queuePresences=[]
 
+# 		@rosterSend=false
+
 		@test_cout=0
 		
 	end
@@ -29,7 +31,7 @@ public
 		setIncomingMessagesCallback
 		setRoster
 		setPresenceCallback
-		setStatus(:online,"test_status",40)	#!!!!!!!!!!!!!!!!!!!!!!!!!11
+		setStatus(:xa,"test_status",60)	#!!!!!!!!!!!!!!!!!!!!!!!!!11
 		#setUpdateCallback
 	end
 	
@@ -94,7 +96,7 @@ public
 			msg=msgAndTime[0]
 			time=msgAndTime[1]
 			
-			a_closure.call(msg.from.to_s,msg.type,msg.body,msg.subject,time)
+			a_closure.call(msg.from.strip.to_s,msg.type,msg.body,msg.subject,time)
 		}
 		@queueMessages.clear
 	end
@@ -140,24 +142,33 @@ public
 		@queuePresences.clear
 	end
 	
+# 	def rosterSend?
+# 		return @rosterSend
+# 	end	
+
+	#set @rosterSend flag in true
+# 	def rosterIsSend
+# 		@rosterSend=true
+# 	end
+
 private
 	#
 	def setIncomingMessagesCallback
-# 		p "JabberClient.setIncomingMessagesCallback---start"
+#  		p "JabberClient.setIncomingMessagesCallback---start"
 		@client.add_message_callback{|msg|
 			
-# 			p "msg="+ msg.body+"\n"
+#   			p "msg="+ msg.body+"\n"
 			@queueMessages.push([msg,Time.now])
-# 			p "after\n"
+#  			p "after\n"
 		}
-# 		p "JabberClient.setIncomingMessagesCallback---end"
+#   		p "JabberClient.setIncomingMessagesCallback---end"
 	end
 
 	##
 	#Loading roster from jabber-server and set him
-	def setRoster
-		@roster=Jabber::Roster::Helper.new(@client)
-		@roster.wait_for_roster
+ 	def setRoster
+ 		@roster=Jabber::Roster::Helper.new(@client)
+ 		@roster.wait_for_roster
 	end
 	
 	##
@@ -190,6 +201,8 @@ private
 	@port
 	
 	@test_cout	#variable for test
+
+# 	@rosterSend
 
 	@roster
 	@client

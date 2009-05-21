@@ -29,12 +29,12 @@ def printPresences
 	}
 end
 
-	$jc=JabberClient.new("test@jabber.port13.lan/321","123456","jabber.port13.lan",5222)
+	$jc=JabberClient.new("test@jabber.port13.lan","123456","jabber.port13.lan",5222)
 	$jc.connect
 	$jc.fullInit
-	$jc.sendChatMessage("test@jabber.port13.lan","1111111")
+# 	$jc.sendChatMessage("test@jabber.port13.lan","1111111")
 	#$jc.sendMessage("test@jabber.port13.lan","месага",:normal, "тема")
-	$jc.setStatus(:xa,"test_status",40)
+	$jc.setStatus(:online,"test_status",-1)
 
 	#$jc.addContact("test@jabber.port13.lan")
 	#$jc.delContact("test@jabber.port13.lan")
@@ -46,5 +46,5 @@ end
 		exit
 	}
 
-# 	Thread.stop
+ 	Thread.stop
 
