@@ -7,41 +7,17 @@ require 'singleton'
 
 class ExecuterRequest
 	include Singleton
-#	def initialize
+	def initialize
 # 		p "ExecuterRequest.new"
-#	end
-	#!!!скорее  всего устаревший
-	#Выполнение запроса
-	#a_request объект типа ParsedInfo, содержащий запрос
-	#a_jabberClient объект над которым будут выполнятся действия.
-=begin
-	def run(a_request,a_jabberClient)
-		p "ExecuterRequest.run"
-		res=JsonObject.new
-		res.data={"processing query"=>""}
-		p "req=="+a_request.inspect
-		additional_query=a_request.data['additional_query']
-		unless additional_query=={}
-			unless additional_query['session_close']==nil
-				a_jabberClient.closeConnection
-				return res
-			end
-			puts 'additional_query==='+additional_query.inspect
-			messages=additional_query['send_message']
-			puts 'messages==='+messages.inspect
-			send_messages(messages,a_jabberClient)
-		else
-			res.data={"processing incoming msgs, etc.."=>""}
-			
-		end
-		parsedResp=ParsedInfo.new
-		parsedResp.data={'messages'=>[]}
-		a_jabberClient.eachIncomingMessages{|from,type,msg,subj,time|
-			parsedResp.data['messages'].push({'from'=>from,'type'=>type,'text'=>msg})
-		}
-		return parsedResp
+		@strShowToString={	"chat" =>	:chat,
+					"online" =>	:online,
+					"dnd" =>	:dnd ,
+					"away" => 	:away,
+					"xa" => 	:xa,
+# 					"unavailable"=>	:unavailable,
+					"error" =>	:error}
 	end
-=end
+
 	def execute(a_request)
 #  		p 'ExecuterRequest.execute'
 		if typeRequest(a_request)==:login
@@ -70,11 +46,41 @@ class ExecuterRequest
 	def getIncomingMessages(a_jabberClient)
 		res=[]
 		a_jabberClient.eachIncomingMessages{ |from,type,msg,subj,time|
-			p 'msg'
- 			res.push({'from'=>from,'type'=>type,'text'=>msg})
+# 			p 'msg'
+			res.push({'from'=>from,'type'=>type,'text'=>msg,'time'=> time.strftime('%H:%M:%S') })
+#  			res.push({'from'=>from,'type'=>type,'text'=>msg,'time'=> "atatat" })
  		}
 # 		p 'getIncomingMessages:' + res.inspect
 		return res
+	end
+
+	def getStatuses(a_jabberClient)
+		res=[]
+		a_jabberClient.eachPresences do |jid,newShow,newStatus,oldShow,oldStatus|
+			res.push({'jid'=> jid, 'show'=> newShow.to_s, 'status'=> newStatus })
+		end
+		return res
+	end
+
+	def setStatus(a_request,a_jabberClient)
+		if a_request['change_status']==nil
+			return
+		end
+		statusRequest=a_request['change_status']
+		show=:online
+		status=''
+		unless statusRequest['show'].nil?
+			unless @strShowToString[statusRequest['show']].nil?
+				show=@strShowToString[statusRequest['show']]
+			end
+		end
+		unless statusRequest['status'].nil?
+			unless statusRequest['status'].nil?
+				status=statusRequest['status']
+			end
+		end
+ 		a_jabberClient.setStatus(show,status)
+#		a_jabberClient.setStatus(show,'atatat pish')
 	end
 
 	def loginExec(a_request)
@@ -130,12 +136,6 @@ class ExecuterRequest
 		
 		jabberClient=ClientManager.instance[sid].jabberClient
 		
-# 		unless jabberClient.rosterSend?
-#			p 'sendFullRoster '+ sendFullRoster(jabberClient).inspect
-# 			res.data['new_contacts']=sendFullRoster(jabberClient)
-# 			p 'new_contacts='+res.data['new_contacts'].inspect
-# 			jabberClient.rosterIsSend
-# 		end
 
 		additional_query=a_request.data['additional_query']
 		unless additional_query=={}
@@ -145,24 +145,19 @@ class ExecuterRequest
 				return res
 			end
 
-			res.data['new_contacts']=getRoster(additional_query,jabberClient)
+			if getRoster(additional_query,jabberClient)
+				res.data['new_contacts']=getRoster(additional_query,jabberClient)
+			end
 
 			sendMessages(additional_query,jabberClient)
-			res.data["messages"] = []
-			res.data["status_change"] = []
-		end
-  		res.data["messages"] = []
-# 		res.data['messages']=getIncomingMessages(jabberClient)
-		res.data["status_change"] = []
-# 		p 'prev'
+			setStatus(additional_query,jabberClient)
 
-#		begin::work code
-  		jabberClient.eachIncomingMessages{ |from,type,msg,subj,time|
-# 			p 'msg'
-  			res.data['messages'].push({'from'=>from,'type'=>type,'text'=>msg})
-  		}
+		end
+ 		res.data['messages']=getIncomingMessages(jabberClient)
+		res.data['change_status']=getStatuses(jabberClient)
+
 		return res
-# 		end
+
 
 
 # 		rescue
@@ -187,7 +182,7 @@ class ExecuterRequest
 		end
 	end
 
-
+	@strShowToString
 	
 end
 

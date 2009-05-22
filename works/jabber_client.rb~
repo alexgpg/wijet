@@ -154,14 +154,14 @@ public
 private
 	#
 	def setIncomingMessagesCallback
- 		p "JabberClient.setIncomingMessagesCallback---start"
+#  		p "JabberClient.setIncomingMessagesCallback---start"
 		@client.add_message_callback{|msg|
 			
-  			p "msg="+ msg.body+"\n"
+#   			p "msg="+ msg.body+"\n"
 			@queueMessages.push([msg,Time.now])
 #  			p "after\n"
 		}
-  		p "JabberClient.setIncomingMessagesCallback---end"
+#   		p "JabberClient.setIncomingMessagesCallback---end"
 	end
 
 	##

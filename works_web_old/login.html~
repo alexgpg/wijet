@@ -1,3 +1,5 @@
+<!-- перехватить кнопку, загнать все в жсон и послать аяксом серверу и принять результат и его распечатать в дебаг-рамочке -->
+
 <!-- http://crisp.tweakblogs.net/blog/tojsonstring()-and-object-punt-prototype.html -->
 <!-- http://therealcrisp.xs4all.nl/upload/json2.js -->
 <!-- http://www.json.org/json_parse.js -->
@@ -6,7 +8,7 @@
 
 <html>
 <head>
-  <title>Welcome 2 Wijet, please login</title>
+  <title>Тестим оякс, жсон и еще много страшных слов..</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <!-- includes
@@ -17,6 +19,8 @@
   <script src="js/json2str.js" type="text/javascript"></script> <!-- .json2str() src -->
   <script src="js/str2json.js" type="text/javascript"></script> <!-- .str2json() src -->
 
+  <script src="js/jquery.cookie.js" type="text/javascript"></script> <!-- cookies src -->
+
 <!-- scripts
 -------------------------------------------------------------------------------- -->
 
@@ -24,6 +28,7 @@
 
     var debug = function(str) {
       $("#debug").append(str+"\n");
+//      $("#debug").prepend(str+"\n");
     };
 
     /* document.ready
@@ -31,14 +36,21 @@
 
     $(document).ready(function(){
 
+    var COOKIE_NAME = 'session_id';
+    var options = { path: '/', expires: 10 };
+
+     var lock = false;
+
     $('#loginform_submit').click(function(e) {
         e.preventDefault();
+	if (lock) return null;
+	lock = true;
 
 	var fields = $("#loginform :input").serializeArray();
 
         $.ajax({
           type: "POST",
-          url: "web_io.fcgi",
+          url: "login.cgi",
           data: toJSONString(fields),
           // By setting the processData option to false, the automatic conversion of data to strings is prevented.
 //          processData: false,
@@ -47,9 +59,22 @@
           cache: false,
           success: function(reply){
             debug(reply);
-          };
+
+	    var sid = reply.str2json().session_id;
+            if (sid == "null") {
+              debug("error: login failed"); // here will be error handling
+	      lock = false;
+	      return null;
+	    }
+
+            $.cookie(COOKIE_NAME, sid, options);
+	    document.location.href = "index.html";
+          }
         });
 
+	/**
+	debug(toJSONString(fields));
+	/**/
       });
     });
   </script>

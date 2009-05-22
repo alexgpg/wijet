@@ -902,7 +902,6 @@ function _XTouchTab (_contact) {
   _pinTab({index: _index});
   _getTab(_index);
   
-//   bindNestedEvents();
 };
 
 /* XIsOpened *
@@ -1201,4 +1200,7 @@ function _XDelTab (_contact) {
   };
  
 })(jQuery);
+
+
+
 

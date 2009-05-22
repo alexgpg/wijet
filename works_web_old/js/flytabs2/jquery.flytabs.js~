@@ -891,7 +891,7 @@ function _XTouchTab (_contact) {
   var _index = _XIsOpened(_contact);
 
   if (!_index) {
-    _contact.msg = _contact.log = ''; ///todo
+    _contact.msg = _contact.log = '';
     _XAddTab(_contact);
     _index = _XIsOpened(_contact);
   }
@@ -902,7 +902,6 @@ function _XTouchTab (_contact) {
   _pinTab({index: _index});
   _getTab(_index);
   
-//   bindNestedEvents();
 };
 
 /* XIsOpened *
@@ -1201,4 +1200,7 @@ function _XDelTab (_contact) {
   };
  
 })(jQuery);
+
+
+
 

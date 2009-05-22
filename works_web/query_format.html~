@@ -22,7 +22,8 @@ var query = {
       {
         "to": _reciever_jid,
         "type": _type,
-        "text": _text
+        "text": _text,
+        "time": _time
       }
     ],
     <div>// манипуляции с контакт-листом</div>
@@ -47,8 +48,7 @@ var reply = {
     {
       "from": _sender_jid,
       "type": _type,
-      "text": _text,
-      "time": _time
+      "text": _text 
     }
   ],
   "change_status": [

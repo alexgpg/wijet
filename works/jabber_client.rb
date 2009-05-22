@@ -137,7 +137,7 @@ public
 			newStatus='' if newStatus.nil?
 			oldStatus='' if oldStatus.nil?
 
-			a_closure.call(item.jid.to_s,newShow,newStatus,oldShow,oldStatus)
+			a_closure.call(item.jid.strip.to_s,newShow,newStatus,oldShow,oldStatus)
 		}
 		@queuePresences.clear
 	end

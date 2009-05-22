@@ -247,6 +247,7 @@
     };
 
     Contact.prototype.changeStatus = function(_show, _status) {
+      // todo
       debug("action: Contact.changeStatus() // " + this.nick);
       this.status = {
         show: _show,
@@ -258,10 +259,7 @@
       else
         this.show();
 
-      if (_status)
-        $('#' + this.clistId + ' .status').text(this.status.show + ': ' + this.status.status);
-      else
-        $('#' + this.clistId + ' .status').text(this.status.show);
+      $('#' + this.clistId + ' .status').text(this.status.show + ': ' + this.status.status);
     };
 
     Contact.prototype.moveToGroup = function() {
@@ -484,8 +482,7 @@
       if (typeof reply.change_status != "undefined")
 	jQuery.each(reply.change_status, function() {
 		debug('Change status: ' + this.jid + "'s to " + this.show);
-		var show = this.show;
-		Client.Contact_changeStatus(this.jid, { "show": show, "status": this.status });
+		Client.Contact_changeStatus(this.jid, { "show": this.show, "status": this.status });
 	});
       /// processing recieved messages
       if (typeof reply.messages != "undefined")
@@ -545,13 +542,13 @@
     $('#status_show').change(function() {
 //      debug($('#status_show :selected').get(0).value);
       tmp_status_show = $('#status_show :selected').get(0).value;
-      Engine.sendData({"change_status" : {"show": tmp_status_show, "status": tmp_status_status}});
+      Engine.sendData({"show": tmp_status_show, "status": tmp_status_status});
     });
     $('#status_all').submit(function(e) {
       e.preventDefault();
       tmp_status_status = $('#status_status').get(0).value;
 //      debug(tmp_status_status);
-      Engine.sendData({"change_status" : {"show": tmp_status_show, "status": tmp_status_status}});
+      Engine.sendData({"show": tmp_status_show, "status": tmp_status_status});
     });
 /**/
 /* tests
@@ -704,8 +701,8 @@
 							<option value="online" selected>Online</option>
 							<option value="away">Away</option>
 							<option value="dnd">Do not disturb</option>
-<!-- 							<option value="unavailable">Unavailable</option> -->
-<!--							<option value="invisible">Invisible</option> -->
+							<option value="unavailable">Unavailable</option>
+							<option value="invisible">Invisible</option>
 <!-- 							<option value="offline">Offline</option> -->
 						</select>
 						<br>

@@ -85,22 +85,8 @@
    XTouchTab : function(args) { 
     _selector = _temp_selector;
     return _XTouchTab(args);
-   },
-   
-   XHlTab : function(args) { 
-    _selector = _temp_selector;
-    return _XHlTab(args);
-   },
-   
-   XCloseOtherTabs : function(args) { 
-    _selector = _temp_selector;
-    return _XCloseOtherTabs(args);
-   },
-   
-   XCloseAllTabs : function(args) { 
-    _selector = _temp_selector;
-    return _XCloseAllTabs(args);
    }
+   
   };
 
  // aliases
@@ -752,8 +738,6 @@
         tabElement.removeClass("tabOff");
       if (tabElement.hasClass("tabOn"))
         tabElement.removeClass("tabOn");
-      if (tabElement.hasClass("tabHighlighted"))
-        tabElement.removeClass("tabHighlighted");
  
       tabElement.addClass("tabPinned");
       tabElement.attr("defaultClass", tabElement.attr("class"));
@@ -799,99 +783,21 @@
 **********************************************************************/
 
 var bindNestedEvents = function() {
-      $msg = $('#tab_msg_window');
-      $log = $('#tab_log_window');
-
-      // stop here if no tabs opened
-      if (!($msg.length + $log.length))
-        return;
-
-      //var id = $('.tabPinned').attr("name"); // todo
-      var id = $msg.attr("name");
-      var contact = CList.contacts[id];
-
-      $log.text(contact.log);
-      $msg.text(contact.msg);
-
-      // bind msg_send event
-      $msg.unbind("click mouseover keyup change");
-      $msg.bind("click mouseover keyup change", function(e){
-        if (e.which == 13) {
-            Client.Message_send(this); // todo
-//            debug('msg_send for ' + id);
-            this.value = '';
-            contact.msg = ''; // magic for ie // todo
-        }
-        contact.msg = this.value;
-      });
-
-      $msg.focus();
-};
-
-/*
-    ChatWindow.activateTab = function() {
-      $msg = $('textarea:last');
-      var id = $('.tabPinned').attr("name");
-
-//      $('#log_'+id).text(ChatWindow.find(id).log);
-      $('textarea:first').text(ChatWindow.find(id).log);
-//      $('#msg_'+id).text(ChatWindow.find(id).msg);
-      $('textarea:last').text(ChatWindow.find(id).msg);
-
-      // bind msg_send event
-      $msg.unbind("click mouseover keyup change");
-      $msg.bind("click mouseover keyup change", function(e){
-        if (e.which == 13) {
-            Client.Message_send(this);
-            this.value = '';
-        }
-        ChatWindow.find(id).msg = this.value;
-      });
-
-      // var tab = ChatWindow.find(id);
-
-      $msg.focus();
-    };
-*/
-
-/* _XHlTab
-**********************************************************************/
-
-function _XHlTab (_contact) {
-
-  var _index = _XIsOpened(_contact);
-
-  if (!_index)
-    return;
-
-  _index--;
-
-  var $tabs = $(_selector);
-
-  var data = _data['tabs'][_selector][_index];
-
-   $tabs.each(function() {
-     var tabElement = $(this).children().eq(_index);
-
-     if (!tabElement.hasClass("tabPinned"))
-       tabElement.addClass("tabHighlighted");
-
-     tabElement.attr("defaultClass", tabElement.attr("class"));
-    });
-
-  return ($(_selector));
+  $('#test1').mouseover(function(){
+    debug('nya! ^_^ i\'m ' + $(this).attr("name"));
+  });
 };
 
 /* _XTouchTab
 **********************************************************************/
 
 function _XTouchTab (_contact) {
-//  debug('XTouchTab for \'' + _contact.nick + '\'');
-
+  
+  debug('XTouchTab for \'' + _contact.nick + '\'');
+  
   var _index = _XIsOpened(_contact);
 
   if (!_index) {
-    _contact.msg = _contact.log = ''; ///todo
     _XAddTab(_contact);
     _index = _XIsOpened(_contact);
   }
@@ -902,7 +808,6 @@ function _XTouchTab (_contact) {
   _pinTab({index: _index});
   _getTab(_index);
   
-//   bindNestedEvents();
 };
 
 /* XIsOpened *
@@ -932,60 +837,26 @@ function _XIsOpened (_contact) {
     return counter+1;
 };
 
-/* XCloseOtherTabs
-**********************************************************************/
-
-// returns 'false' or 'tab index + 1'
-function _XCloseOtherTabs (_contact) {
-  var _index = _XIsOpened(_contact);
-
-  if (!_index)
-    return;
-
-  _index--;
-
-  while (_countTabs() != _index + 1)
-    _removeTab({ index : _index + 1 });
-
-  while (_countTabs() > 1)
-    _removeTab({ index : 0 });
-
-  _clearTabs();
-  _pinTab({index: 0});
-  _getTab(0);
-};
-
-/* XCloseAllTabs
-**********************************************************************/
-
-// returns 'false' or 'tab index + 1'
-function _XCloseAllTabs () {
-  while (_countTabs())
-    _removeTab({ index : 0 });
-
-  emptyTabs();
-};
-
 /* XDelTab *
 **********************************************************************/
 
 function _XDelTab (_contact) {
-//  debug('XDelTab for \'' + _contact.nick + '\'');
-
+  
+  debug('XDelTab for \'' + _contact.nick + '\'');
+  
   var _index = _XIsOpened(_contact);
   if (!_index) {
     debug('error: can\'t delete unexistent tab (' + _contact.id + ')');
     return 0;
   }
-
+  
   _index--;
 
   _removeTab({index: _index});
-
-  _contact.log = _contact.msg = '';
-
+  
   // pin tab after deleted
   // or emptyTabs() if no tabs left
+  
   var count = _countTabs();
   
   if (count && (_index < count)) {
@@ -1013,13 +884,8 @@ function _XDelTab (_contact) {
   var args = {
         caption: _contact.nick,
         name: _contact.id,
-        html: 	''+
-//        	'tab for \'' + _contact.nick + '\''+
-//		'<br><br><a href=# id=test1 name='+_contact.id+'>__test1__</a>'+
-		
-		'<table width=100%><tr><td><textarea name=' + _contact.id + ' id=tab_log_window readonly style=width:100%;height:200px;>' +
-                 '[timestamp] ' + _contact.nick +': привет!</textarea></td></tr><tr><td>' +
-                 '<textarea name=' + _contact.id + ' id=tab_msg_window style=width:100%;>печатать сюда)</textarea></td></tr></table>'
+        html: 	'tab for \'' + _contact.nick + '\''+
+		'<br><br><a href=# id=test1 name='+_contact.id+'>__test1__</a>'
   };
  
 //  debug('XAddTab for \'' + args.name + '\'');
@@ -1177,10 +1043,13 @@ function _XDelTab (_contact) {
         _XDelTab(_contact);
       }
       else if (action == "menu_close_all_tabs") {
-        _XCloseAllTabs();
+//        ChatWindow.closeAllTabs();
+        debug('todo: close all tabs');
       }
       else if (action == "menu_close_other_tabs") {
-        _XCloseOtherTabs(_contact);
+//        ChatWindow.closeOtherTabs($(el).attr("name"));
+////        ChatWindow.test($(el).attr("name"));
+        debug('todo: close other tabs');
       }
       else if (action == "menu_view_vcard") {
 //        CList.find($(el).attr("name")).showVCard();
@@ -1201,4 +1070,7 @@ function _XDelTab (_contact) {
   };
  
 })(jQuery);
+
+
+
 
