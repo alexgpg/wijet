@@ -36,6 +36,8 @@ end
 	#$jc.sendMessage("test@jabber.port13.lan","месага",:normal, "тема")
 	$jc.setStatus(:online,"test_status",60)
 
+	
+
 	#$jc.addContact("test@jabber.port13.lan")
 	#$jc.delContact("test@jabber.port13.lan")
 	

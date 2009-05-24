@@ -42,6 +42,8 @@ class ExecuterRequest
 		end
 	end
 
+	def getAvatars(a_jabberClient)
+	end
 
 	def getIncomingMessages(a_jabberClient)
 		res=[]
@@ -130,7 +132,7 @@ class ExecuterRequest
 		sid=a_request.sessionId
 		if ClientManager.instance[sid]==nil
 			#todo::
-			res.data={"hui"=>"hui"}
+			res.data={"Error"=>"not authorization"}
 			return res
 		end
 		
@@ -147,6 +149,7 @@ class ExecuterRequest
 
 			if getRoster(additional_query,jabberClient)
 				res.data['new_contacts']=getRoster(additional_query,jabberClient)
+# 				res.data['avatars']=getAvatars(jabberClient)
 			end
 
 			sendMessages(additional_query,jabberClient)
@@ -178,7 +181,7 @@ class ExecuterRequest
 			return :work
 		else
 			#todo!!!!!!!!
-			return :xz
+			return :error
 		end
 	end
 

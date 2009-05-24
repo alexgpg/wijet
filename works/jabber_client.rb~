@@ -2,6 +2,9 @@
 require '../works/requirer'
 requireWithGems 'xmpp4r/client'
 requireWithGems 'xmpp4r/roster/helper/roster'
+requireWithGems 'xmpp4r/vcard/helper/vcard'
+requireWithGems 'xmpp4r/vcard/iq/vcard'
+
 
 
 class JabberClient
@@ -137,20 +140,14 @@ public
 			newStatus='' if newStatus.nil?
 			oldStatus='' if oldStatus.nil?
 
-			a_closure.call(item.jid.to_s,newShow,newStatus,oldShow,oldStatus)
+			a_closure.call(item.jid.strip.to_s,newShow,newStatus,oldShow,oldStatus)
 		}
 		@queuePresences.clear
 	end
 	
-# 	def rosterSend?
-# 		return @rosterSend
-# 	end	
-
-	#set @rosterSend flag in true
-# 	def rosterIsSend
-# 		@rosterSend=true
-# 	end
-
+	def getVCard(a_jid)
+ 		vCardHelper=Vcard::Helper.new
+	end
 private
 	#
 	def setIncomingMessagesCallback

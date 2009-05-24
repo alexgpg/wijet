@@ -766,7 +766,7 @@
 <!-- <img src="data:image/png;base64," /> -->
 
 
-<!-- hardcoded ThickBox plugin's dialog window templates
+<!-- Hardcoded ThickBox plugin's dialog window templates
 -------------------------------------------------------------------------------- -->
 	
 	<div class=modal_dialog id="orly_deleteContact">
