@@ -1,22 +1,27 @@
 <html>
 <head>
-  <title>Хеловорлд</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Эксклюзивные фотографии Боярского без шляпы!</title>
 
 <!-- includes
 -------------------------------------------------------------------------------- -->
 
   <script src="js/jquery-1.3.1.min.js" type="text/javascript"></script> <!-- jQuery src -->
   <script src="js/contextMenu/jquery.contextMenu.js" type="text/javascript"></script> <!-- contextMenu plugin src -->
-  <script src="js/flytabs/jquery.flytabs.js" type="text/javascript"></script> <!-- FlyTabs plugin src -->
+  <!--script src="js/flytabs/jquery.flytabs.js" type="text/javascript"></script> <!-- FlyTabs plugin src -->
+  <script src="js/flytabs2/jquery.flytabs.js" type="text/javascript"></script> <!-- FlyTabs plugin src -->
+  <script src="js/thickbox/thickbox.js" type="text/javascript"></script> <!-- ThickBox plugin src -->
 
   <script src="js/json2str.js" type="text/javascript"></script> <!-- .json2str() src -->
   <script src="js/str2json.js" type="text/javascript"></script> <!-- .str2json() src -->
 
   <script src="js/jquery.cookie.js" type="text/javascript"></script> <!-- cookies src -->
 
+  <!--link href="js/contextMenu/jquery.contextMenu_.css" rel="stylesheet" type="text/css" /> <!-- contextMenu plugin styles -->
   <link href="js/contextMenu/jquery.contextMenu.css" rel="stylesheet" type="text/css" /> <!-- contextMenu plugin styles -->
-  <link href="js/flytabs/flytabs_.css" rel="stylesheet" type="text/css" /> <!-- Fly Tabs plugin styles -->
+  <link href="js/flytabs2/flytabs.css" rel="stylesheet" type="text/css" /> <!-- Fly Tabs plugin styles -->
+  <link href="js/thickbox/thickbox.css" rel="stylesheet" type="text/css" /> <!-- ThickBox plugin styles -->
+  <!--link href="js/flytabs2/flytabs_orig.css" rel="stylesheet" type="text/css" /> <!-- Fly Tabs plugin styles -->
 
 <!-- scripts
 -------------------------------------------------------------------------------- -->
@@ -24,11 +29,307 @@
   <script type="text/javascript">
 
     var debug = function(str) {
-      $("#debug").prepend(str+"\n");
+      $("#debug").prepend(str+"<br>");
+//      $("#debug").append(str+"\n");
+    };
+    
+    var emptyTabs = function() {
+      $('#chatTabs').flyTabs.addTab({
+        name: 'you don\'t see this!',
+//	html: "<div class=empty_tabs><tt>no tabs selected</tt></div>",
+	html: '<table width=100%><tr><td><textarea readonly style=width:100%;height:200px;>no tabs opened</textarea></td></tr><tr><td><textarea readonly style=width:100%;></textarea></td></tr></table>',
+        status: 'pinned'
+      });
+/**/      
+      var lastindex = $('#chatTabs').flyTabs.countTabs()-1;
+//      debug(lastindex);
+      $('#chatTabs').flyTabs.removeTab({
+        index: lastindex
+      });
+/**/
+//       $('#clist').css({ 'padding-top' : '150px;' });
+    };
+    
+/* setHtml
+**********************************************************************/
+
+    var objectCnt = 0;
+
+    var setHtml = function(_code, _prefix) {
+      var _id = _prefix + objectCnt++;
+      var _html = '<div id=' + _id + '>' + _code + '</div>';
+      
+      return {
+        html: _html,
+        id: _id
+      };
+    };
+    
+    // aliases
+    var setContact = function(_code) {
+      return setHtml(_code, 'Contact_');
     };
 
+/* CList
+**********************************************************************/
+
+    var CList = {
+      contacts: {}
+    };
+    
+    CList.addContact = function(_jid, _nick) {
+      var nc = new Contact(_jid, _nick);
+      this.contacts[nc.id] = nc;
+      
+//      debug(nc.id);
+//      debug(this.contacts[nc.id]);
+    };
+    
+    CList.deleteContact = function(_id) {
+      //todo
+      Engine.sendData({"delete_contact" : this.contacts[_id].jid});
+      delete this.contacts[_id];
+    };
+    
+    // can't imagine what else can be here
+
+/* Contact
+**********************************************************************/
+
+    var Contact = function(_jid, _nick) {
+      if (typeof(_jid) != "undefined")
+        this.jid = _jid;
+
+      if (typeof(_nick) != "undefined")
+        this.nick = _nick;
+      else
+        this.nick = "todo: default nick generetion =)";
+
+      // todo
+      // unique id will be here)
+      this.id = this.jid;
+
+      this.draw();
+    };
+
+/*
+    var Contact = function(_jid, _nick, _group) {
+      if (typeof(_jid) != "undefined")
+        this.jid = _jid;
+      if (typeof(_nick) != "undefined")
+        this.nick = _nick;
+      if (typeof(_group) != "undefined")
+        this.group = _group;
+
+      // todo
+      // unique id will be here)
+      this.id = this.jid;
+
+      this.draw();
+    };
+*/
+
+    Contact.prototype = {
+      id:       "undef",
+      jid:      "undef",
+      nick:     "undef",
+      clistId:  "undef",
+
+      msg: "",
+      log: "",
+
+      status: {
+        show: "Offline",
+        status: "status"
+      }, /// todo
+
+      group: "", /// todo
+
+      avatar: "",
+
+      parent: 0
+    };
+
+    Contact.prototype.draw = function() {
+      var html = "<div id="+this.id+"><table class=entry cellpadding=0 cellspacing=0><tr><td class=avaframe><img src=# /></td><td><table cellpadding=0 cellspacing=0><tr><td><div class=nick>"+this.nick+"</div></td></tr><tr><td><div class=status>&nbsp;</div></td></tr><tr><td><tt><div class=jid>["+this.jid+"]</div></tt></td></tr></table></td></tr></table></div>";
+//      +"<div id="+this.id+"><b>"+this.nick+"</b>&nbsp;&nbsp;<div class=status>&nbsp;</div><br /><tt>["+this.jid+"]</tt><br /></div>";
+      //var html = "<div id="+this.id+"><b>"+this.nick+"</b>&nbsp;&nbsp;<div class=status>&nbsp;</div><br /><tt>["+this.jid+"]</tt><br /></div>";
+      //var html = "<div id="+this.id+"><b>"+this.nick+"</b><br /><tt>["+this.jid+"]</tt><br /></div>";
+      var tmp = setContact(html);
+      $('#clist').append(tmp.html);
+      this.clistId = tmp.id;
+      this.bindEvents('#' + this.clistId + ' div', this);
+      
+      this.loadAvatar();
+    };
+/*
+    Contact.prototype.loadAvatar = function() {
+      // todo
+      
+      //$('#' + this.clistId + ' .avaframe img').get(0).src = this.avatar;
+      //debug($('#' + this.clistId + ' .avaframe img').length);
+
+      
+    };
+*/
+
+    Contact.prototype.hide = function() {
+      debug('action: Contact.hide() // ' + this.nick);
+      $('#' + this.clistId).css('display', 'none');
+    };
+
+    Contact.prototype.show = function() {
+      debug('action: Contact.show() // ' + this.nick);
+      $('#' + this.clistId).css('display', '');
+    };
+
+    Contact.prototype.showVCard = function() {
+      debug("action: Contact.showVCard() // '"+this.nick+"'");
+      var that = this;
+
+      var html = Client.getVCard(this.jid);
+
+      $('#show_vCard_text').empty();
+      $('#show_vCard_text').append(html);
+
+//      infoWindow(" " + this.nick + "'s vCard", "show_vCard", 170, 400);
+      dialogWindow(" " + this.nick + "'s vCard", "show_vCard", 170, 400);
+      var $ok = $('#show_vCard_ok');
+      $ok.unbind("click");
+
+      $ok.bind("click", function() {
+        closeWindow();
+        $('#tab_msg_window').focus();
+      });
+    };
+
+    Contact.prototype.deleteContact = function() {
+      debug("action: Contact.deleteContact() // '"+this.nick+"'");
+      var that = this;
+
+      dialogWindow("Delete " + this.nick + "?", "orly_deleteContact", 60, 300);
+      var $yes = $('#orly_deleteContact_yes');
+      var $no = $('#orly_deleteContact_no');
+
+      $yes.unbind("click");
+      $no.unbind("click");
+
+      $yes.bind("click", function() {
+        closeWindow();
+        $('#chatTabs').flyTabs.XDelTab(that);
+        that.hide();
+        CList.deleteContact(that.id);
+
+        if ($('.tabPinned').length) {
+          var id = $('.tabPinned').attr("name");
+          $('#chatTabs').flyTabs.XTouchTab(CList.contacts[id]);
+        }
+      });
+
+      $no.bind("click", function() {
+        closeWindow();
+        $('#tab_msg_window').focus();
+      });
+    };
+
+    Contact.prototype.loadAvatar = function(avatar) {
+      // todo
+      if (!Client.avatarsEnabled()) {
+        $('#' + this.clistId + ' .avaframe img').get(0).src = Client.disabledAvatar;
+        return;
+      }
+      // if user has an avatar
+      if (typeof(avatar) != "undefined")
+        $('#' + this.clistId + ' .avaframe img').get(0).src = 'data:image/jpeg;base64,'+avatar;
+      // if user has no avatar
+      else
+        $('#' + this.clistId + ' .avaframe img').get(0).src = Client.defaultAvatar;
+    };
+
+    Contact.prototype.changeStatus = function(_show, _status) {
+      debug("action: Contact.changeStatus() // " + this.nick);
+      this.status = {
+        show: _show,
+        status: _status
+      };
+	
+	if (this.status.show == "xa")
+		this.status.show = "Not available";
+	if (this.status.show == "online")
+		this.status.show = "Online";
+	if (this.status.show == "offline")
+		this.status.show = "Offline";
+
+      if (this.status.show == "Offline")
+        this.hide();
+      else
+        this.show();
+
+      if (_status)
+        $('#' + this.clistId + ' .status').text(this.status.show + ': ' + this.status.status);
+      else
+        $('#' + this.clistId + ' .status').text(this.status.show);
+    };
+
+    Contact.prototype.moveToGroup = function() {
+      // todo
+      debug("todo: Contact.moveToGroup() // '"+this.nick+"'");
+    };
+
+    Contact.prototype.bindEvents = function(_elem, _contact) {
+      $(_elem).click(function() {
+        $('#chatTabs').flyTabs.XTouchTab(_contact);
+// 	$('#clist').css({ 'padding-top' : '0px;' });
+      });
+/**/
+      // i'll need this later
+      $(_elem).mouseover(function() {
+        $(this).addClass("hover");
+      });
+
+      $(_elem).mouseout(function() {
+        $(this).removeClass("hover");
+      });
+/**/
+      // Context Menu
+      var that = this;
+
+      $(_elem).contextMenu({
+        menu: 'ContactCMenu'
+      }, function(action, el, pos) {
+        if (action == "menu_view_vcard") {
+          that.showVCard();
+        }
+        else if (action == "menu_delete_contact") {
+          that.deleteContact();
+        }
+        else if (action == "menu_move_to_group") {
+          that.moveToGroup(); /// todo
+        }
+        else
+          alert(
+            'Action: ' + action + '\n\n' +
+    //        'Element text: ' + $(el).text() + '\n\n' + 
+    //        'X: ' + pos.x + '  Y: ' + pos.y + ' (relative to element)\n\n' + 
+    //        'X: ' + pos.docX + '  Y: ' + pos.docY+ ' (relative to document)\n\n' +
+            'id: ' + $(el).attr("id")
+          );
+      });
+    };
+
+/* Client
+**********************************************************************/
+
+    var Client = {
+      userName: "феофан",
+      isAvatarsEnabled: 1,
+      defaultAvatar: "i/default_ava/ava1.jpeg",
+      disabledAvatar: "i/default_ava/ava2.jpeg"
+    };
+
+    // for alfa version only // todo
     var localTime = function() {
-      var today=new Date();
+      var today = new Date();
       var h = addLeadingZeroes(today.getHours());
       var m = addLeadingZeroes(today.getMinutes());
       var s = addLeadingZeroes(today.getSeconds());
@@ -41,352 +342,92 @@
       return n;
     };
 
-/* CList
-**********************************************************************/
-
-    var CList = {
-      iam: "#clist",
-      items: []
-    };
-
-    CList.addItem = function(item) {
-      item.parent = this;
-      this.items.push(item);
-    };
-
-    CList.remItem = function(_id) {
-      item = this.find(_id);
-      item.id = "deleted";
-      item.jid = "";
-      item.nick = "";
-      this.draw();
-    };
-
-    CList.draw = function() {
-      $(this.iam).empty();
-      for (i = 0; i < this.items.length; ++i)
-        this.items[i].id == "deleted" || this.items[i].draw();
-
-      //bind events
-      $("#clist DIV").click(function() {
-        ChatWindow.touchTab(this.id);
-      });
-/* i'll need this later
-      $("#clist DIV").mouseover(function() {
-        $(this).addClass("hover");
-      });
-
-      $("#clist DIV").mouseout(function() {
-        $(this).removeClass("hover");
-      });
-*/
-      // Show menu when a list item is rightclicked
-      $("#clist DIV").contextMenu({
-        menu: 'cListItemCMenu'
-      }, function(action, el, pos) {
-        if (action == "menu_view_vcard") {
-          CList.find($(el).attr("id")).showVCard();
-        }
-        else if (action == "menu_delete_contact") {
-          CList.find($(el).attr("id")).deleteContact();
-        }
-        else
-          alert(
-            'Action: ' + action + '\n\n' +
-    //        'Element text: ' + $(el).text() + '\n\n' + 
-    //        'X: ' + pos.x + '  Y: ' + pos.y + ' (relative to element)\n\n' + 
-    //        'X: ' + pos.docX + '  Y: ' + pos.docY+ ' (relative to document)\n\n' +
-            'id: ' + $(el).attr("id")
-            );
-      });
-    };
-
-    CList.find = function(_id) {
-      for (i = 0; i < this.items.length; ++i) {
-        if (this.items[i].find(_id))
-          return this.items[i].find(_id);
-      }
-    };
-
-/* CListItem
-**********************************************************************/
-
-    // constructor
-    var CListItem = function(_jid, _nick) {
-      if (typeof(_jid) != "undefined")
-        this.jid = _jid;
-      if (typeof(_nick) != "undefined")
-        this.nick = _nick;
-      // unique id will be here)
-      this.id = this.jid;
-    };
-
-    // fields and default values
-    CListItem.prototype.id = "undef";
-    CListItem.prototype.jid = "undef";
-    CListItem.prototype.nick = "undef";
-    CListItem.prototype.parent = 0;
-    CListItem.prototype.widget = 0;
-
-    // methods
-    CListItem.prototype.draw = function() {
-    var html = "<div id="+this.id+"><b>"+this.nick+"</b><br /><tt>["+this.jid+"]</tt><br /></div>";
-      $(this.parent.iam).append(html);
-    };
-
-    CListItem.prototype.find = function(_id) {
-      if (_id == this.id)
-        return this;
-      return 0;
-    };
-
-    CListItem.prototype.showVCard = function() {
-      alert("CListItem.prototype.showVCard()\n\nfor '"+this.id+"'");
-    };
-
-    CListItem.prototype.deleteContact = function() {
-      alert("CListItem.prototype.deleteContact()\n\nfor '"+this.id+"'");
-    };
-
-/* ChatWindow
-**********************************************************************/
-
-    var ChatWindow = {
-      iam: "#chatwindow",
-      tabs: []
-    };
-
-    ChatWindow.countTabs = function(_id) {
-      return $('#chatTabs').flyTabs.countTabs();
-    };
-
-    ChatWindow.isOpened = function(_id) {
-      var _index = $('#chatTabs').flyTabs.getTabIndex(_id);
-      if (_index == -5)
-        return false;
-      return true;
-    };
-
-    ChatWindow.find = function(_id) {
-      for (i = 0; i < this.tabs.length; ++i) {
-        if (this.tabs[i].find(_id))
-          return this.tabs[i].find(_id);
-      }
-    };
-
-    ChatWindow.addTab = function(tab) {
-      this.tabs.push(tab);
-    };
-
-    ChatWindow.activateTab = function() {
-      $msg = $('textarea:last');
-      var id = $('.tabPinned').attr("name");
-
-//      $('#log_'+id).text(ChatWindow.find(id).log);
-      $('textarea:first').text(ChatWindow.find(id).log);
-//      $('#msg_'+id).text(ChatWindow.find(id).msg);
-      $('textarea:last').text(ChatWindow.find(id).msg);
-
-      // bind msg_send event
-      $msg.unbind("click mouseover keyup change");
-      $msg.bind("click mouseover keyup change", function(e){
-        if (e.which == 13) {
-            Client.Message_send(this);
-            this.value = '';
-        }
-        ChatWindow.find(id).msg = this.value;
-      });
-
-      // var tab = ChatWindow.find(id);
-
-      $msg.focus();
-    };
-
-    ChatWindow.touchTab = function(_id) {
-      // open tab for this id if it isn't already opened
-      if (!this.isOpened(_id)) {
-        this.addTab(new ChatTab(_id));
-      }
-      $chat = $('#chatTabs');
-      var _index = $chat.flyTabs.getTabIndex(_id);
-      // pin tab for this id
-      // (doesn't matter if it was already opened or it was opened in code above)
-      $chat.flyTabs.clearTabs();
-      $chat.flyTabs.pinTab({ index : _index});
-      $chat.flyTabs.getTab(_index);
-
-      this.activateTab();
-    };
-
-    ChatWindow.closeTab = function(_id) {
-      if (this.isOpened(_id)) {
-        var _index = $('#chatTabs').flyTabs.getTabIndex(_id);
-
-        $('#chatTabs').flyTabs.removeTab({index : _index});
-
-        $('#chatTabs').flyTabs.clearTabs();
-        $('#chatTabs').flyTabs.pinTab({ index : _index-1});
-        $('#chatTabs').flyTabs.getTab(_index-1);
-
-        this.activateTab();
-        // todo: rewrite with deletion
-//        this.beta__deleteTab(_id);
-        
-        
-        for (i = 0; i < this.tabs.length; ++i) {
-        var found = this.tabs[i].find(_id);
-          if (found) {
-            found.log = "";
-            found.msg = "";
-            found.id = "deleted";
-            return 0;
-          }
-        }
-      }
-      else
-        debug("error: tryin to close nonexistent tab! atatat!");
-    };
-
-    ChatWindow.closeOtherTabs = function(_id) {
-      var _index = $('#chatTabs').flyTabs.getTabIndex(_id);
-
-      while (this.countTabs() != _index + 1)
-        $('#chatTabs').flyTabs.removeTab({ index : _index + 1 });
-
-      while (this.countTabs() > 2)
-        $('#chatTabs').flyTabs.removeTab({ index : 1 });
-
-      //this.beta__deleteOther(_id);
-      
-      
-      for (i = 0; i < this.tabs.length; ++i) {
-        var found = this.tabs[i].self();
-        if (found.id != _id) {
-//          debug(found.id + ' != ' + _id);
-          found.log = "";
-          found.msg = "";
-          found.id = "deleted";
-        }
-      }
-      
-      
-      this.touchTab(_id);
-    };
-
-    ChatWindow.closeAllTabs = function() {
-      while (this.countTabs() != 1)
-        $('#chatTabs').flyTabs.removeTab({ index : 1 });
-
-      $('#chatTabs').flyTabs.clearTabs();
-      $('#chatTabs').flyTabs.pinTab({ index : 0 });
-      $('#chatTabs').flyTabs.getTab(0);
-
-      //this.beta__deleteAll();
-      
-      
-      for (i = 0; i < this.tabs.length; ++i) {
-        var found = this.tabs[i].self();
-        if (found) {
-          found.log = "";
-          found.msg = "";
-          found.id = "deleted";
-        }
-      }
-    };
-
-/* ChatTab
-**********************************************************************/
-
-    // constructor
-    var ChatTab = function(_id) {
-      if (typeof(_id) == "undefined") {
-        debug("error: cannot create tab object instance - no id specified");
-        return;
-      }
-      this.id = _id;
-      // open tab
-      var item = CList.find(_id);
-      var html = '<table width=100%><tr><td><textarea id=log_' + item.id + ' readonly style=width:100%;height:200px;>' +
-                 '[timestamp] ' + item.nick +': привет!</textarea></td></tr><tr><td>' +
-                 '<textarea class=msg name=' + item.id + ' id=msg_' + item.id + ' style=width:100%;>печатать сюда)</textarea></td></tr></table>';
-      $('#chatTabs').flyTabs.addTab({
-        caption: item.nick,
-        name: item.id,
-        html: html
-      });
-    };
-
-    // fields and default values
-    ChatTab.prototype.id = "";
-    ChatTab.prototype.msg = "";
-    ChatTab.prototype.log = "";
-
-    // methods
-    ChatTab.prototype.find = function(_id) {
-      if (_id == this.id)
-        return this;
-      return 0;
-    };
-
-    ChatTab.prototype.self = function() {
-      return this;
-    };
-
-/* Client
-**********************************************************************/
-
-    var Client = {
-      userName: "феофан"
-    };
-
     Client.Message_send = function(elem) { // textarea
       // todo: reset global ajax timer
       var id = $(elem).attr("name");
       var msg = $.trim(elem.value);
-
+      var contact = CList.contacts[id];
+/**/
       Engine.sendData({"send_message": [
         {
           "to": id,
           "type": "chat",
-	  "text": msg
-	}
+          "text": msg
+        }
       ]});
-
+/**/
       debug('sending message "' + msg + '" to "' + id + '"');
+      contact.log = contact.log + '\n' + '[' + localTime() + '] ' + Client.userName + ': ' + msg; // todo: time
 
-      var tab = ChatWindow.find(id);
+      //ChatWindow.activateTab();
 
-      tab.log = tab.log + '\n' + '[' + localTime() + '] ' + Client.userName + ': ' + msg;
-
-      ChatWindow.activateTab();
+      /// todo
+      $msg = $('#tab_msg_window');
+      $log = $('#tab_log_window');
+      $log.text(contact.log);
+      $msg.text(contact.msg);
     };
 
-    Client.Message_recieve = function(_id, _msg) {
-      if (!ChatWindow.isOpened(_id))
-        ChatWindow.addTab(new ChatTab(_id));
+    Client.Message_recieve = function(_id, _msg, _time) {
+      if (typeof _time == "undefined")
+        _time = "error recieving time from server";
+//      debug(_id + ' : ' + _msg);
+      var contact = CList.contacts[_id];
 
-      var tab = ChatWindow.find(_id);
+      // monstrous
+      if (!$('#chatTabs').flyTabs.XIsOpened(contact))
+        if (!$('#chatTabs').flyTabs.countTabs())
+          $('#chatTabs').flyTabs.XTouchTab(contact);
+        else
+          $('#chatTabs').flyTabs.XAddTab(contact);
 
-      var buddy = CList.find(_id);
-      tab.log = tab.log + '\n' + '[' + localTime() + '] ' + buddy.nick + ': ' + _msg;
+//       contact.log = contact.log + '\n' + '[' + localTime() + '] ' + contact.nick + ': ' + _msg;
+      contact.log = contact.log + '\n' + '[' + _time + '] ' + contact.nick + ': ' + _msg;
 
-      $('#chatTabs').flyTabs.hlTab($('#chatTabs').flyTabs.getTabIndex(_id)); // highlight tab for _id
+      $('#chatTabs').flyTabs.XHlTab(contact);
 
-      ChatWindow.activateTab();
+      /// todo
+      if ($('.tabPinned').length) {
+        var id__ = $('.tabPinned').attr("name");
+        $msg = $('#tab_msg_window');
+        $log = $('#tab_log_window');
+        $log.text(CList.contacts[id__].log);
+        $msg.text(CList.contacts[id__].msg);
+      }
     };
 
     Client.Contact_add = function(_jid, _nick) {
-      CList.addItem(new CListItem(_jid, _nick));
-      CList.draw();
-      //untested
+      CList.addContact(_jid, _nick);
     };
 
+    Client.getVCard = function(_id) {
+      // Engine.sendData();
+      // Engine.handleReply();
+      // -> Client.shovVCard();
+      // todo
+
+      debug("todo: Client.getVCard()");
+      var html = "<p align=justify><img src=i/default_ava/ava3.jpeg align=left valign=middle />Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.</p>";
+      return html;
+    };
+
+    Client.Contact_new = function(_jid) {
+      // todo
+    };
+
+/*
     Client.Contact_remove = function(_id) {
       CList.remItem(_id);
     };
+*/
 
-    Client.Contact_changeStatus = function(_id, _status) {
-      debug("Changing status: " + _id + " is now " + _status);
+    Client.Contact_changeStatus = function(_id, _status) { /// todo
+      debug("Client.Contact_changeStatus: " + _id + " is now " + _status.show);
+      CList.contacts[_id].changeStatus(_status.show, _status.status);
+    };
+
+    Client.Self_changeStatus = function(_status) { /// todo
+      debug("Client.Self_changeStatus: i am now " + _status.show);
     };
 
     Client.Session_close = function() {
@@ -395,22 +436,35 @@
       document.location.href = "login.html";
     };
 
+    Client.avatarsEnabled = function() {
+      return this.isAvatarsEnabled;
+    };
+
+    Client.enableAvatars = function() {
+      this.isAvatarsEnabled = 1;
+    };
+
+    Client.disableAvatars = function() {
+      this.isAvatarsEnabled = 0;
+    };
+
 /* Engine
 **********************************************************************/
 
     var Engine = {
       session_id: "null",
-//      session_id: $.cookie('session_id');
       refresh_timeout: 3000,
       timer: ""
     };
 
     Engine.start = function() {
-      this.timer = setTimeout("Engine.refresh()" ,this.refresh_timeout);
+      debug("Engine started");
+      this.timer = setTimeout("Engine.refresh()", this.refresh_timeout);
+      Engine.sendData({"get_roster" : "true"});
     };
 
     Engine.refresh = function() {
-      debug(localTime() + ' refreshed!');
+//      debug(localTime() + ' refreshed!');
       this.sendData({});
 
       this.timer = setTimeout("Engine.refresh()", this.refresh_timeout);
@@ -422,29 +476,33 @@
     };
 
     Engine.handleReply = function(_reply) {
-      debug("server's reply: " + _reply);
+      if (_reply != '{"messages":[],"change_status":[]}')
+        debug("server's reply: " + _reply);
 
       var reply = _reply.str2json();
-      for (var i = 0; i < reply.messages.length; ++i) {
-	//var re = new RegExp('/(.*)\\\//');
-	
-	//debug("ATATAT: " + re.match(1));
-//	reply.messages[i].from.match('/(.*)\\\//')
-	debug(reply.messages[i].from + ": " + reply.messages[i].text);
-	Client.Message_recieve(reply.messages[i].from, reply.messages[i].text);
-      }
-/*      $.each(reply.messages, function() {
-         debug(this.from + ": " + this.text);
-	// todo
-	var re = new RegExp('/(.*)\\\//');
-	debug("type: " + typeof re.match(1));
-	debug("ATATAT: " + re.match(1));
-//	Client.Message_recieve(this.from, this.text);
-      });
-  */  };
+
+      /// recieving roster / new contacts
+      if (typeof reply.new_contacts != "undefined")
+	jQuery.each(reply.new_contacts, function() {
+		debug('Adding contact: ' + this.jid + ' named ' + this.nick);
+		CList.addContact(this.jid, this.nick);
+	});
+      /// handling status changes
+      if (typeof reply.change_status != "undefined")
+	jQuery.each(reply.change_status, function() {
+		debug('Change status: ' + this.jid + "'s to " + this.show);
+		var show = this.show;
+		Client.Contact_changeStatus(this.jid, { "show": show, "status": this.status });
+	});
+      /// processing recieved messages
+      if (typeof reply.messages != "undefined")
+	for (var i = 0; i < reply.messages.length; ++i) {
+		debug(reply.messages[i].from + ": " + reply.messages[i].text);
+		Client.Message_recieve(reply.messages[i].from, reply.messages[i].text, reply.messages[i].time);
+	}
+  };
 
     Engine.sendData = function(_query) { // _query must be an object
-
       var query = {
         "session_id": Engine.session_id,
         "additional_query": _query
@@ -452,7 +510,7 @@
 /**/
       $.ajax({
         type: "POST",
-        url: "im.cgi",
+        url: "web_io.fcgi",
         data: toJSONString(query),
         // By setting the processData option to false, the automatic conversion of data to strings is prevented.
 //          processData: false,
@@ -462,33 +520,19 @@
         success: Engine.handleReply
       });
 /**/
-      debug("query sent: " + toJSONString(query));
+       if ((toJSONString(_query) != "{}")) 
+         debug("query sent: " + toJSONString(query));
+
+      /// maybe needed.. todo
+      //this,resetTimer();
     };
 
-/* Query
+/* Ready
 **********************************************************************/
 
-/*
-    var Query = function() {
-      
-    };
+  $(document).ready(function() {
 
-    Query.prototype = {
-      "send_message": [
-        { "to": _reciever_jid, "type": _type, "text": _text }
-      ],
-      "get_full_roster": "",
-      "add_contact": "",
-      "delete_contact": "",
-      "change_status": ""
-    };*/
-
-/* document.ready
-**********************************************************************/
-
-  $(document).ready(function(){
-
-    // govnokod (todo)
+/**/
     // check cookie existence
     if ($.cookie('session_id') == null)
       document.location.href = "login.html";
@@ -497,246 +541,261 @@
     debug("session_id cookie: " + Engine.session_id);
 
     Engine.start(); // wrooooommm!
-
-    // manual testing
-    CList.addItem(new CListItem("melhesedek@jabber.ru/Nokia", "Melhesedek"));
-    CList.addItem(new CListItem("vasya156@jabber.ru", "V4sy4"));
-    CList.addItem(new CListItem("user115@qip.ru", "2ch4ever!"));
-    CList.addItem(new CListItem("kate12@q.ru", "kate12"));
-    CList.addItem(new CListItem("jora35@er.ru", "goga"));
-    CList.addItem(new CListItem("atatat@livejournal.com", "Ы. Вонг"));
-    CList.addItem(new CListItem("dr0n@jabber.org", "Dr0n"));
-    CList.addItem(new CListItem("killer@jabber.port13.lan\/Gajim", "killer"));
-    CList.draw();
-
-/* debug
-**********************************************************************/
-
-    $("#ok").click(function() {
-      Client.Message_recieve($("#who").get(0).value, $("#what").get(0).value);
-    });
-
-    $("#test15").click(function() {
-      CList.remItem("dr0n@jabber.org");
-    });
-
-    $("#start_engine").click(function() {
-      Engine.start();
-    });
-
-    $("#reset_engine").click(function() {
-      Engine.resetTimer();
-    });
+/**/
 
     $("#exit").click(function() {
       Client.Session_close();
     });
-
-/* Fly Tabs
-**********************************************************************/
-
-    $('#chatTabs').flyTabs.config({effect: 'no'});
-    $('#chatTabs').flyTabs.addTab({
-      caption: '>',
-//       icon: 'logo-50x50.gif',
-//     name: '',
-    html: '<table width=100%><tr><td><textarea readonly style=width:100%;height:200px;>' +
-//          'погладь кота, сука)\n\naka ' +
-          'no contacts selected</textarea></td></tr><tr><td>' +
-          '<textarea disabled style=width:100%;> ... </textarea></td></tr></table>',
-      status: 'pinned'
+/**/
+    var tmp_status_show = "online";
+    var tmp_status_status = "";
+    $('#status_show').change(function() {
+//      debug($('#status_show :selected').get(0).value);
+      tmp_status_show = $('#status_show :selected').get(0).value;
+      Engine.sendData({"change_status" : {"show": tmp_status_show, "status": tmp_status_status}});
+    });
+    $('#status_all').submit(function(e) {
+      e.preventDefault();
+      tmp_status_status = $('#status_status').get(0).value;
+//      debug(tmp_status_status);
+      Engine.sendData({"change_status" : {"show": tmp_status_show, "status": tmp_status_status}});
+    });
+/**/
+/* tests
+**********************************************************************
+    $('#rm').click(function() {
+      d.hide();
     });
 
-    debug(localTime());
-/*
-    var query = {
-        "session_id": Engine.session_id,
-        "additional_query": ""
-    };
-    debug(toJSONString(query));
-*/
+    $('#revieve').click(function() {
+      d.show();
+    });
+
+    $('#hl').click(function() {
+      $('#chatTabs').flyTabs.XHlTab(d);
+    });
+
+    $('#said').click(function() {
+      Client.Message_recieve($('#who').get(0).value, $('#what').get(0).value);
+    });
+
+    $('#status').click(function() {
+      Client.Contact_changeStatus($('#who2').get(0).value, {show: $('#to').get(0).value, status: $('#to2').get(0).value});
+    });
+
+    // manual adding contacts
+    
+   *
+    CList.addContact("melhesedek@jabber.ru/Nokia", "Melhesedek");
+    CList.addContact("vasya156@jabber.ru", "V4sy4");
+    CList.addContact("user115@qip.ru", "2ch4ever!");
+    CList.addContact("kate12@q.ru", "kate12");/*
+    CList.addContact("jora35@er.ru", "goga");
+    CList.addContact("atatat@livejournal.com", "Ы. Вонг");
+    CList.addContact("dr0n@jabber.org", "Dr0n");
+    CList.addContact("killer@jabber.port13.lan\/Gajim", "killer");
+    CList.addContact("jora235@er.ru", "goga2");
+    
+    var d = CList.contacts['dr0n@jabber.org'];
+    
+    d.changeStatus("Online", "studying");
+
+    d.loadAvatar("/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCAAyADIDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAcEBQYDCP/EADgQAAIBAgMGAgYJBQEAAAAAAAECAwAEBQYRBxIhMUFhUYETFiIycbEUFSNScpGistEkNWN0kvD/xAAaAQADAAMBAAAAAAAAAAAAAAAAAgMBBAUG/8QAIxEAAwEAAQMDBQAAAAAAAAAAAAECEQQDITESIkEzNHGRwf/aAAwDAQACEQMRAD8AeNLbP20r6ouZMMwNY5btNVmncarE3gB1YfkO9avPOMNgWV76+iOk4TchPg7HQHy118q82MxZizElidSTzJpaeFIne7LHEsexfFCTiGJXU4J13XkO6PgvIVDtLu5sphNZ3EsEo5PE5U/mK40UhYZ2SdqF1BPFY5kk9NbMd1bsj24/xacx35/GnGjK6K6MGVhqGB1BFeUJEaN2SRSrqdCrDQg08djuOvieX5MPuHLz4ewVS3WNvd/LQj4AU0v4JXPyjf0UUU5IXm29iuVLUDk18gP/AA9JCnftvUtlW1P3b5D+h6xuSNnqZjwtMQuL9oI2lZNxEBOg5nUnry/nlU68l4eSYSON5ZFjiRndjoqqNST2FMzImzid54sSzBH6OJSGjtG95j0L+A7VscqZQ9W4NdcPnnEh+0jtyjFDw95mY69fDpw51e4hFiM8Mq4bdW1tKE+zeaIyAt3AI4fz24o93EDvsK7bDlz6PdR45aoBFORHcBRyfo3mOHl3rjsPlZczXkIJ3XsyxHcOunzNMPMuH3dxlS/tr6aC5ZrNizJHuaSKNdQNTw1Hlp16LnYiD613R6Cxf96VmNTxg3sjwoooqxAyu0+wa/yViCxjV4Qsw+CkE/p1pUZCz3JlqU2V8jTYbI297PvRN4jxHiP/ABftxDHc28kEyhopUKOp6gjQivPGJ5DxWLNi4DboGaVma3mkbdV4xx3tew5gcaSkn5Kw1mDoa+sMxYJP9V3UVyskZ3dxuIPMajmOPjUTKZjscGlur2RYUeQkvK26NBw699aXWJ5W9WJIobq9DObYuhiO59oCARqenHWuElrbYhJDDb38088s6xqZn10DacdOfXTyoXFTytO/0eHNcf0q/bWPx+ydtF2ipfwyYRgLt9Hb2Z7nl6QfdXt4nr85mwqz3r3Fb0r7kaRKfxEk/tFUOb9m2JYNA2I280V5abwD7o3HUk6D2STrqSOR148qauzfL8uXctRwXQ0urhjPMv3CQAF8gB560KUvBwuo5WpPTU0UUU5AKg4rDE628rxo0kVxGY3KglCWAOh6agkedFFBlC72yD+tww/45PmKxeXv77h/+wnzFFFbMfTPYcD7Bfh/0e1zGkuJ2SyorqqPIoYagMN3Rh3Gp496sKKK1jx4UUUUGD//2Q==");
+    
+/* code
+**********************************************************************/
+    
+    $('#chatTabs').flyTabs.config({effect: 'no'});
+    emptyTabs();
+    
+//    $('#chatTabs').flyTabs.clearTabs(); // ?
+        
   });
-/* // todo
-  $(document).unload(function(e) {
-    alert("atatat");
-  });
-*/
   </script>
 
 <!-- css styles
 -------------------------------------------------------------------------------- -->
 
   <style type="text/css">
+  
     body {
-      background-color: black;
-      color: gold;
+      background-color: #ccffcc;
     }
-    table {
-      border: none;
-    }
-    input {
-      background-color: grey;
-      color: pink;
-    }
-    #pre-results, #results {
-      width: 300px;
-      border: 1px solid red;
-    }
-
-    #clist {
-      width: 100%;
-/      border: 1px solid green;
-      margin: 0;
-      padding: 0;
-    }
-    #clist-frame {
-      margin: 0;
-      padding: 0;
-      min-width: 200px;
-      border: 1px solid gray;
-    }
-
-    .flyTabs {
-      width: 500px;
-/*       height: 400px; */
-/*       border: 1px solid red; */
-      border: none;
-    }
-
+     
     #debug {
       border: 1px dotted red;
-      color: pink;
+      color: black;
       width: 500px;
     }
-/*
-    #chatTabs #chatTabs-tabID1 {
-      background-color: red;
-    }
-*/
-    #clist DIV {
-      padding: 5px;
-      padding-left: 20px;
-      padding-bottom: 7px;
-      background-color: #eaeaea;
-      color: black;
-      border-left: 5px solid gray;
-    }
-
-    #clist DIV:hover {
-//      background-color: #442222;
-//      padding-left:20px;
-      border-left: 5px solid red;
-      cursor: pointer;
-    }
-
-    #clist DIV TT {
-      color: gray;
-    }
-
-    #clist .hover {
-      background-color: red;
-    }
-
+     
     div.scroll {
-/*       min-height: 2em; */
-/*       max-height: 20em; */
+/*     min-height: 2em; */
+/*     max-height: 20em; */
       height: 15em;
       overflow: auto;
     }
-
-    #removedItem {
-      display: none;
+    
+    #clist .hover {
+      /*background-color: pink;*/
+      background-color: #ddffdd;
     }
-  </style>
-</head>
+    
+    #clist .status {
+      font-size: small;
+      color: gray;
+      display: inline;
+    }
+    
+/* clist styles
+************/
+    #clist table {
+      padding: 0;
+      margin: 0;
+    }
+    
+    #clist .entry {
+      margin: 2px;
+    }
+    
+    #clist .entry .avaframe img {
+      padding-right: 10px;
+    }
+    
+    #clist .entry .nick {
+      font-weight: bold;
+      display: inline;
+    }
+    
+    #clist .entry .status {
+      font-size: small;
+      color: gray;
+      display: inline;
+      margin-left: 5px;
+    }
+    
+    #clist .entry .jid {
+      display: inline;
+    }
+    /*
+    .empty_tabs {
+      height: 270px;
+    }
+    */
+    </style>
+  </head>
 
 <!-- hardcoded html
 -------------------------------------------------------------------------------- -->
+  
+  <body>
+    <table cellpadding=0 cellspacing=0 width=100%>
+		<tr>
+			<td style="min-width: 20%; vertical-align: top;"> <!-- Contact List -->
+				<table id=clist-frame>
+					<span id=clist>&nbsp;</span> <!-- mem -->
+					<!--- todo (statuses) --->
+					<hr>
+					Status:
+					<form id="status_all">
+						<select id="status_show">
+<!--
+    							"chat" =>	:chat,
+							"online" =>	:online,
+							"dnd" =>	:dnd ,
+							"away" => 	:away,
+							"xa" => 	:xa,
+							"unavailable"=>	:unavailable,
+							"error" =>	:error}
+-->
+							<option value="chat" selected>Ready for chat</option>
+							<option value="online" selected>Online</option>
+							<option value="away">Away</option>
+							<option value="dnd">Do not disturb</option>
+<!-- 							<option value="unavailable">Unavailable</option> -->
+<!--							<option value="invisible">Invisible</option> -->
+<!-- 							<option value="offline">Offline</option> -->
+						</select>
+						<br>
+<!-- 						<input type=text id="status_status" value="играю в шахматы" /> -->
+						<input type=text id="status_status" />
+					</form>
+				</table>
+			</td>
+			<td style="vertical-align: top;"> <!-- Chat Window -->
+				<div style="text-align: left; padding-left: 15px; width: 600px;">
+					<ul id="chatTabs"></ul>
+				</div>
+			</td>
+		</tr>
+	<br>
+    </table>
+    <hr />
+    <br /><br /><br /><br /><br /><br />
+	<pre>
+		<div id=debug class=scroll></div>
+	</pre>
+	<input type=button id=exit value="Exit"/>
 
-<body>
-<!--   <br /> -->
-<!-- clist --
-  <table id=clist-frame cellspacing=0 cellpadding=0>
-    <tr>
-      <td style="text-align: center; border-bottom: 1px solid gray; background-color: #eaeaea; color: gray; border-left: 5px solid gray;">контакт-лист</td>
-    </tr>
-    <tr><td>
-      <table id=clist  cellspacing=0 cellpadding=0></table>
-    </td></tr>
-  </table>
-<!--  -->
-<!-- <br /> -->
-<!-- chatwindow --
-  <div class=flyTabs>
-    <ul id="chatTabs"></ul>
-  </div>
-<!--    -->
+<!-- test buttons
+    ---------------------------------------------------------------------------- -->
+      <!--input type=button id=rm value="rm dron"/>
+      <input type=button id=revieve value="revieve dron" />
+      <input type=button id=hl value="hl dron" />
+      <br>
+      <input type=text id=who value=dr0n@jabber.org>
+      <input type=button id=said value=" said " />
+      <input type=text id=what value=test>
+      <br>
+      <input type=text id=who2 value=kate12@q.ru>
+      <input type=button id=status value=" changed status to " />
+      <input type=text id=to value=Busy>:
+      <input type=text id=to2 value=sleeping^^-->
 
-<table border=0 height=100%>
-  <tr>
-    <td colspan=3 valign=top>&nbsp;</td>
-  </tr>
-  <tr>
-    <td valign=top>
-   
-      <table id=clist-frame cellspacing=0 cellpadding=0>
-        <tr>
-          <td style="text-align: center; border-bottom: 1px solid gray; background-color: #eaeaea; color: gray; border-left: 5px solid gray;">Wijet</td>
-        </tr>
-        <tr><td>
-          <table id=clist  cellspacing=0 cellpadding=0></table>
-        </td></tr>
-      </table>
+<!--hr>
+<a href="#TB_inline?height=155&width=300&inlineId=hiddenModalContent&modal=true" title="Test" class="thickbox">Show hidden modal content.</a>
+<input alt="#TB_inline?height=150&amp;width=400&amp;inlineId=hiddenModalContent" title="add a caption to title attribute / or leave blank" class="thickbox" type="button" value="Show" /-->
+<!--br /><input type=button id=tbtest value=" tbtest " /-->
 
-    </td>
-    <td valign=top>&nbsp;</td>
-    <td valign=top style="padding: 3px;">
-      
-      <div class=flyTabs>
-        <ul id="chatTabs"></ul>
-      </div>
-      
-    </td>
-  </tr>
-  <tr>
-    <td colspan=3 valign=top style="border-top: 1px dotted gray; color: gray;">
-      
-      <tt>// debug line, don't cross! debug line, don't cross! debug line, don't cross! //</tt>
-      <br />
-      <br />
-<!--       <input type=text id=who value="dr0n@jabber.org"/> -->
-<!--       <input type=button id=ok value=said /> -->
-<!--       <input type=text id=what value="пинг!"/> -->
-<!--       <br /> -->
-<!--       <input type=button id=test15 value="rm dr0n"/> -->
-<!--       <br /> -->
-      <input type=button id=exit         value="Exit"/>
-<!--       <input type=button id=start_engine value="start engine"/> -->
-<!--       <input type=button id=reset_engine value="reset timer"/> -->
-      <pre>
-        <div id=debug class=scroll></div>
-      </pre>
-      
-    </td>
-  </tr>
-</table>
+<!--
+-------------------------------------------------------------------------------- -->
+
+<!------------------------------------------------------------------------------ -->
+
+<!------------------------------------------------------------------------------ --
+
+      <br>
+      time for base64!
+      <br>
+      <img src="data:image/jpeg;base64,/9j/4AAQSkZJ---skipped=)---UGD//2Q==" />
+
+<!------------------------------------------------------------------------------ -->
+
+<img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCAAyADIDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAcEBQYDCP/EADgQAAIBAgMGAgYJBQEAAAAAAAECAwAEBQYRBxIhMUFhUYETFiIycbEUFSNScpGistEkNWN0kvD/xAAaAQADAAMBAAAAAAAAAAAAAAAAAgMBBAUG/8QAIxEAAwEAAQMDBQAAAAAAAAAAAAECEQQDITESIkEzNHGRwf/aAAwDAQACEQMRAD8AeNLbP20r6ouZMMwNY5btNVmncarE3gB1YfkO9avPOMNgWV76+iOk4TchPg7HQHy118q82MxZizElidSTzJpaeFIne7LHEsexfFCTiGJXU4J13XkO6PgvIVDtLu5sphNZ3EsEo5PE5U/mK40UhYZ2SdqF1BPFY5kk9NbMd1bsj24/xacx35/GnGjK6K6MGVhqGB1BFeUJEaN2SRSrqdCrDQg08djuOvieX5MPuHLz4ewVS3WNvd/LQj4AU0v4JXPyjf0UUU5IXm29iuVLUDk18gP/AA9JCnftvUtlW1P3b5D+h6xuSNnqZjwtMQuL9oI2lZNxEBOg5nUnry/nlU68l4eSYSON5ZFjiRndjoqqNST2FMzImzid54sSzBH6OJSGjtG95j0L+A7VscqZQ9W4NdcPnnEh+0jtyjFDw95mY69fDpw51e4hFiM8Mq4bdW1tKE+zeaIyAt3AI4fz24o93EDvsK7bDlz6PdR45aoBFORHcBRyfo3mOHl3rjsPlZczXkIJ3XsyxHcOunzNMPMuH3dxlS/tr6aC5ZrNizJHuaSKNdQNTw1Hlp16LnYiD613R6Cxf96VmNTxg3sjwoooqxAyu0+wa/yViCxjV4Qsw+CkE/p1pUZCz3JlqU2V8jTYbI297PvRN4jxHiP/ABftxDHc28kEyhopUKOp6gjQivPGJ5DxWLNi4DboGaVma3mkbdV4xx3tew5gcaSkn5Kw1mDoa+sMxYJP9V3UVyskZ3dxuIPMajmOPjUTKZjscGlur2RYUeQkvK26NBw699aXWJ5W9WJIobq9DObYuhiO59oCARqenHWuElrbYhJDDb38088s6xqZn10DacdOfXTyoXFTytO/0eHNcf0q/bWPx+ydtF2ipfwyYRgLt9Hb2Z7nl6QfdXt4nr85mwqz3r3Fb0r7kaRKfxEk/tFUOb9m2JYNA2I280V5abwD7o3HUk6D2STrqSOR148qauzfL8uXctRwXQ0urhjPMv3CQAF8gB560KUvBwuo5WpPTU0UUU5AKg4rDE628rxo0kVxGY3KglCWAOh6agkedFFBlC72yD+tww/45PmKxeXv77h/+wnzFFFbMfTPYcD7Bfh/0e1zGkuJ2SyorqqPIoYagMN3Rh3Gp496sKKK1jx4UUUUGD//2Q==" />
 
 
-<!-- debug messages
--------------------------------------------------------------------------------- --
+<!-- Hardcoded ThickBox plugin's dialog window templates
+-------------------------------------------------------------------------------- -->
+	
+	<div class=modal_dialog id="orly_deleteContact">
+		<center>
+			Do you really want to delete this contact?
+			<br />
+			<br />
+			<input type="button" id="orly_deleteContact_yes" value="&nbsp;&nbsp;Yes&nbsp;&nbsp;" />
+			<input type="button" id="orly_deleteContact_no"  value="&nbsp;&nbsp;No&nbsp;&nbsp;" />
+		</center>
+	</div>
+	<div class=modal_dialog id="show_vCard">
+		<center>
+			<div id=show_vCard_text></div>
+			<br />
+			<br />
+			<input type="button" id="show_vCard_ok"  value="&nbsp;&nbsp;Ok&nbsp;&nbsp;" />
+		</center>
+	</div>
 
-    <br />
-    <input type=text id=who value="dr0n@jabber.org"/>
-    <input type=button id=ok value=said />
-    <input type=text id=what value="пинг!"/>
-    <br />
-    <input type=button id=test15 value="rm dr0n"/>
 
-  <pre>
-    <div id=debug class=scroll></div>
-  </pre>
-
-<!-- contextMenu plugin's menu template
+<!-- Hardcoded contextMenu plugin's menu templates
 -------------------------------------------------------------------------------- -->
 
 <!--    <ul id="testMenu" class="contextMenu">
@@ -756,13 +815,14 @@
       <li class="quit separator"><a href="#menu_close_all_tabs">Close all tabs</a></li>
     </ul>
 
-    <ul id="cListItemCMenu" class="contextMenu">
+    <ul id="ContactCMenu" class="contextMenu">
       <li class="edit"><a href="#menu_view_vcard">View vCard</a></li>
+      <li class="copy separator"><a href="#menu_move_to_group">Move to group</a></li>
       <li class="delete separator"><a href="#menu_delete_contact">Delete</a></li>
     </ul>
 
 <!-- end
 -------------------------------------------------------------------------------- -->
 
-</body>
+  </body>
 </html>

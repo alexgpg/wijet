@@ -50,7 +50,7 @@
 
         $.ajax({
           type: "POST",
-          url: "login.cgi",
+          url: "web_io.fcgi",
           data: toJSONString(fields),
           // By setting the processData option to false, the automatic conversion of data to strings is prevented.
 //          processData: false,
@@ -68,6 +68,7 @@
 	    }
 
             $.cookie(COOKIE_NAME, sid, options);
+		debug("cookie: " + sid);
 	    document.location.href = "index.html";
           }
         });
