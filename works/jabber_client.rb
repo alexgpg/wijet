@@ -6,7 +6,6 @@ requireWithGems 'xmpp4r/vcard/helper/vcard'
 requireWithGems 'xmpp4r/vcard/iq/vcard'
 
 
-
 class JabberClient
 public
 	#ctor
