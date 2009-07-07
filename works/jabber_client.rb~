@@ -146,7 +146,7 @@ public
 	end
 	
 	def getVCard(a_jid)
- 		vCardHelper=Vcard::Helper.new
+ 		Jabber::Vcard::Helper.get(@client, Jabber::JID.new(a_jid))
 	end
 private
 	#
