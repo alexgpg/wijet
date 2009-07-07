@@ -146,7 +146,7 @@ public
 	end
 	
 	def getVCard(a_jid)
- 		
+ 		Jabber::Vcard::Helper.get(@client, Jabber::JID.new(a_jid))
 	end
 private
 	#
@@ -206,3 +206,5 @@ private
 	@queueMessages #format: [[msg,time],[msg2,time2],...]
 	@queuePresences	#format: [[item,old,new] ,[item2,old2,new2],...]
 end
+
+
