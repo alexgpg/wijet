@@ -2,6 +2,8 @@
 
 require '../works/fast_cgi_point'
 
+$stdout = File.open('/dev/pts/6', 'w')
+
 fcgi=FastCGIPoint.new
 
 =begin

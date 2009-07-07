@@ -3,7 +3,6 @@
 require '../works/fast_cgi_point'
 
 fcgi=FastCGIPoint.new
-fcgi.start
 
 =begin
 FCGI.each do |request|
