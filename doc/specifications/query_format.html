@@ -1,0 +1,96 @@
+﻿<html><head>
+  
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Спеки клиент-серверного взаимодействия</title>
+    <style>
+      pre div {
+        color: green;
+        display: inline;
+      }
+      h3 {
+        display: inline;
+      }
+    </style>
+  </head><body>
+    <pre>
+<h3>клиент -&gt; сервер</h3>
+
+var query = {
+  "session_id": _sid,
+  <div>// настаиваю на таком названии =)</div>
+  "additional_query": {
+    <div>// массив - на случай, если захотим добавить возможность слать по нескольким адресам сразу</div>
+    "send_message": [
+      { "to": _reciever_jid, "type": _type, "text": _text },
+      { "to": _reciever_jid, "type": _type, "text": _text }
+    ],
+    "get_full_roster": _get_full_roster,
+    <div>// манипуляции с контакт-листом</div>
+    "add_contact": _jid,
+    "delete_contact": _jid,
+    <div>// чуть не забыли про статус</div>
+    "change_status": {
+      "status_show": _status_show,
+      "status_text": _status_text
+    },
+    "session_close": _session_close
+  }
+};
+
+<div>/*
+планирую прямо этот код и загнать в функцию, задать дефолтных значений типа "" и переопределять при необходимости
+
+"пустой" запрос будет выглядеть как-то так:
+{"session_id":"user@domain.zone18902374","additional_query":{"send_message":[{}],"get_full_roster":"","add_contact":"","delete_contact":"","change_status":""}}
+*/</div>
+
+<h3>сервер -&gt; клиент (ответ сервера)</h3>
+
+var reply = {
+  <div>// массив, ибо их может быть много</div>
+  "messages": [
+    { "from": _sender_jid, "type": _type, "text": _text }
+  ],
+  "roster_updates": {
+    "status_change": [
+      { "jid": _jid, "new_status": {
+         "status_show": _status_show,
+         "status_text": _status_text
+        }
+      },
+    ],
+    "auth_requests": [
+      <div>// запрос(ы) авторизации</div>
+    ],
+    "new_contacts": [
+      {
+        "jid": _jid,
+        "nick": _nick
+      }
+      <div>// реакция сервера на поле запроса "add_contact" и на действия юзера в случае запроса авторизации</div>
+    ],
+    "deleted_contacts": [
+      <div>// реакция сервера на поле запроса "delete contact"</div>
+    ]
+  }
+};
+
+<h3>Логин [клиент -&gt; сервер]</h3>
+
+{
+  "jid": _jid,
+  "pass": _pass,
+  "host": _host
+}
+
+<h3>Логин [сервер -&gt; клиент (ответ сервера)]</h3>
+
+{
+  "session_id": _sid <div>// или пустая строка в случае неудачи..</div>
+
+  <div>// булевое поле success считаю лишним, в нем есть смысл только если передавать код (или текст) ошибки для вывода аяксных матюков</div>
+}
+
+
+    </pre>
+  </body></html>
