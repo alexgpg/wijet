@@ -16,6 +16,16 @@ require 'singleton'
 #	# Read config from file
 #	Config.instance.setConfigFromFile('test_wijet.conf')
 #
+# Example 3:
+#	# using parametrs from config
+#	Config.instance.setConfig do
+#		allow_domains	:all
+#		deny_domains	:no
+#		max_users 100
+#	end
+# 	puts Config.instance.allow_domains
+#	puts Config.instance.max_users
+#
 # Format config file:
 #	field value
 #	other_fileld val
@@ -35,7 +45,7 @@ class Config
 	#
 	# Config.instance.aaa 10500 - set value for fileld "aaa".
 	#
-	# Config.instance.aaa - get fileld with name "aaa", it must be already initialized.
+	# Config.instance.aaa - get fileld with name "aaa", it must be already initialized, else raise exeception
 	def method_missing a_name, *a_args, &a_block
 		if a_args.size==0
 			raise "Variable \"#{a_name}\" not exist"
