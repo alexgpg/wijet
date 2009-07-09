@@ -2,7 +2,7 @@
 $debug_level=0
 
 # File for debug print
-$out_terminal = File.open('/dev/pts/5', 'w')
+$out_terminal = File.open('/dev/pts/2', 'w')
 
 
 # Function for debug print, a_level - more importantly, the lower value.

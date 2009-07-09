@@ -1,8 +1,7 @@
 #!/usr/bin/ruby1.8
 
 require '../works/fast_cgi_point'
-
-$stdout = File.open('/dev/pts/6', 'w')
+require '../works/debug'
 
 fcgi=FastCGIPoint.new
 
