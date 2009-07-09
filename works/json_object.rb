@@ -12,7 +12,7 @@ class JsonObject
 	end
 	
 	def server
-		#todo: убрать эту херь
+		#todo: убрать эту херь!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 		if @data[2]==nil
 			return nil
 		end

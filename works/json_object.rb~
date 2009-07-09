@@ -13,6 +13,9 @@ class JsonObject
 	
 	def server
 		#todo: убрать эту херь
+		if @data[2]==nil
+			return nil
+		end
 		return "81.91.180.150"
 	end
 

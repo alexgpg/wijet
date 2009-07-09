@@ -1,5 +1,8 @@
 
 require '../works/requirer'
+
+require '../works/vcard'
+
 requireWithGems 'xmpp4r/client'
 requireWithGems 'xmpp4r/roster/helper/roster'
 requireWithGems 'xmpp4r/vcard/helper/vcard'
@@ -10,6 +13,7 @@ class JabberClient
 public
 	#ctor
 	def initialize(a_jid, a_pass, a_server, a_port)
+		@jid=a_jid
 # 		p '!JabberClient.new'
 # 		jid=Jabber::JID(a_jid)
 # 		jid.resource='Wijet'
@@ -144,8 +148,24 @@ public
 		@queuePresences.clear
 	end
 	
+	# Get VCard for user.
+	# a_jid:: [String]  - JID
+	# return:: [VCard] - VCard for user a_jid
 	def getVCard(a_jid)
- 		Jabber::Vcard::Helper.get(@client, Jabber::JID.new(a_jid))
+		xmpp4rVCard=Jabber::Vcard::Helper.get(@client, Jabber::JID.new(a_jid))
+		return nil if xmpp4rVCard.nil?
+ 		VCard.new(xmpp4rVCard)
+	end
+
+	# Get own nickname.
+	# return:: [String] - own nickname or node if nickname is empty
+	def ownNick
+		ownVCard=getVCard(@jid)
+		if ownVCard.nil? or ownVCard['NICKNAME'].nil?
+ 			return Jabber::JID.new(@jid).node
+		else
+			ownVCard['NICKNAME']
+		end
 	end
 private
 	#
@@ -192,6 +212,7 @@ private
 		#empty
 	end
 
+	@jid
 	@server
 	@pass
 	@port
