@@ -11,15 +11,14 @@ requireWithGems 'xmpp4r/vcard/iq/vcard'
 
 class JabberClient
 public
-	#ctor
+	# ctor
+	# 
 	def initialize(a_jid, a_pass, a_server, a_port)
-		@jid=a_jid
 # 		p '!JabberClient.new'
-# 		jid=Jabber::JID(a_jid)
-# 		jid.resource='Wijet'
-		#костыль!!!!!!!!!!!!!
-		a_jid+='/Wijet'
-		@client=Jabber::Client.new(a_jid)
+ 		@jid=Jabber::JID.new(a_jid)
+		@jid.resource='Wijet'
+
+		@client=Jabber::Client.new(@jid)
 		@pass=a_pass
 		@server=a_server
 		@port=a_port
@@ -160,9 +159,9 @@ public
 	# Get own nickname.
 	# return:: [String] - own nickname or node if nickname is empty
 	def ownNick
-		ownVCard=getVCard(@jid)
+		ownVCard=getVCard(@jid.to_s)
 		if ownVCard.nil? or ownVCard['NICKNAME'].nil?
- 			return Jabber::JID.new(@jid).node
+ 			return @jid.node
 		else
 			ownVCard['NICKNAME']
 		end
