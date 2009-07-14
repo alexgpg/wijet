@@ -14,11 +14,6 @@ class Client
 		@jabberClient.connect
 	end
 
-	def runRequest(a_parsedRequest)
-# 		p 'Client.runRequest'
-		ExecuterRequest.instance.run(a_parsedRequest,@jabberClient)
-	end
-	
 	def jabberClient
 # 		p 'Client.jabberClient'
 		return @jabberClient
