@@ -10,6 +10,7 @@ class TestExecuter < Test::Unit::TestCase
 		parser=Parser.new
 		str='[{"name":"jid","value":"alexgpg@ya.ru"},{"name":"pass"}]'
 		parsed=parser.parse(str)
+		puts parsed.inspect
 # 		p parsed.inspect
 		assert_equal(ExecuterRequest.instance.typeRequest(parsed),:login)
 	end
@@ -88,6 +89,7 @@ class TestExecuter < Test::Unit::TestCase
 		parser=Parser.new
 		loginStr='[{"name":"jid","value":"wijet@jabber.ru"},{"name":"pass","value":"pivopivo"}]'
 		parsedReq=parser.parse(loginStr)
+		p 'parsedReq = ' + parsedReq.inspect
 		assert_equal(ExecuterRequest.instance.typeRequest(parsedReq),:login)
 		answer=ExecuterRequest.instance.execute(parsedReq)
 		p 'answer='+answer.inspect + '\n'

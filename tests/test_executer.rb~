@@ -10,6 +10,7 @@ class TestExecuter < Test::Unit::TestCase
 		parser=Parser.new
 		str='[{"name":"jid","value":"alexgpg@ya.ru"},{"name":"pass"}]'
 		parsed=parser.parse(str)
+		puts parsed.inspect
 # 		p parsed.inspect
 		assert_equal(ExecuterRequest.instance.typeRequest(parsed),:login)
 	end
