@@ -1,6 +1,5 @@
 require '../works/auth_info'
 require '../works/jabber_client'
-require '../works/executer_request'
 
 class Client
 	def initialize(a_hashArgs={})
