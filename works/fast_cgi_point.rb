@@ -19,7 +19,7 @@ class FastCGIPoint
 				@answer=ExecuterRequest.instance.execute(parsed)
 
 				out << "Content-Type: text/html\n\n"
-				out << @parser.toJsonForLogin(@answer)
+				out << @parser.toJson(@answer)
 
 				request.finish
 			rescue Exception => e
