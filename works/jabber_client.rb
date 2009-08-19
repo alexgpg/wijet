@@ -3,6 +3,8 @@ require '../works/requirer'
 
 require '../works/vcard'
 
+require '../works/debug'
+
 requireWithGems 'xmpp4r/client'
 requireWithGems 'xmpp4r/roster/helper/roster'
 requireWithGems 'xmpp4r/vcard/helper/vcard'
@@ -120,10 +122,19 @@ public
 			item=presence[0]
 			new=presence[1]
 			old=presence[2]
+			
+# 			dbgPrn 2, 'new = ' + new.inspect
+
+			newShow=nil
+			newStatus=nil
+			oldShow=nil
+			oldShow=nil
+
 			if new==nil
 				newShow=nil
 				newStatus=nil
 			else
+# 				dbgPrn 2, 'newShow = ' + new.show.to_s
 				newShow=new.show
 				newStatus=new.status
 			end
@@ -136,8 +147,8 @@ public
 				oldStatus=old.status
 			end
 
-			newShow=:online if newShow.nil?
-			oldShow=:online if oldShow.nil?
+			newShow=:online if newShow.nil? && new.type!=:unavailable
+			oldShow=:online if oldShow.nil? && new.type!=:unavailable
 			
 			newStatus='' if newStatus.nil?
 			oldStatus='' if oldStatus.nil?

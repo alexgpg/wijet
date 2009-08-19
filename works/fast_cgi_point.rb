@@ -8,12 +8,12 @@ class FastCGIPoint
 	def initialize
 		@parser=Parser.new
 	
+		# main loop
 		FCGI.each do |request|
 			begin
 				stuff=request.in.read
 				out = request.out
 
-				
    				parsed=@parser.parse(stuff)
 
 				@answer=ExecuterRequest.instance.execute(parsed)

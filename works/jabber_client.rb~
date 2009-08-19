@@ -3,6 +3,8 @@ require '../works/requirer'
 
 require '../works/vcard'
 
+require '../works/debug'
+
 requireWithGems 'xmpp4r/client'
 requireWithGems 'xmpp4r/roster/helper/roster'
 requireWithGems 'xmpp4r/vcard/helper/vcard'
@@ -120,10 +122,19 @@ public
 			item=presence[0]
 			new=presence[1]
 			old=presence[2]
+			
+			dbgPrn 2, 'new = ' + new.inspect
+
+			newShow=''
+			newStatus=''
+			oldShow=''
+			oldShow=''
+
 			if new==nil
 				newShow=nil
 				newStatus=nil
 			else
+				dbgPrn 2, 'newShow = ' + new.show.to_s
 				newShow=new.show
 				newStatus=new.status
 			end
