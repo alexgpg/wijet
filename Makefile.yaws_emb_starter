@@ -1,0 +1,6 @@
+DIR_WITH_YAWS_PATH = ../../
+yaws_emb_starter.beam: yaws_emb_starter.erl
+	erlc  -I $(DIR_WITH_YAWS_PATH) yaws_emb_starter.erl
+clean:
+	rm yaws_emb_starter.beam
+
