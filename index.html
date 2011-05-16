@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <title>File:index.html</title>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.min.js"></script>
+        <script type="text/javascript">
+            function misultinComet(){
+                auth = {jid: $('#jid').val(), password: $('#password').val()};
+                console.log(auth);
+                $.post('http://localhost:8080/login', auth, function(response){
+                    console.log(response);
+                    toDiv(response);
+                });
+            }
+            
+            function toDiv(content){
+                    $('#content').append(content + '<br>');
+            }
+            
+
+            $(document).ready(function() {
+                $('#login_btn').click(function() {
+                        console.log('Login button click.');
+                        misultinComet();
+                });
+            });
+        </script>
+    </head>
+    
+    <body>
+        Long Polling example, please wait 10 seconds for incoming data.<br><br>
+        <div id="content"></div>
+
+        <form>
+            <span>jid: </span>        <input id="jid" type="text"> <br/>
+            <span>password: </span>    <input id="password" type="text"> <br/>
+            <input id="login_btn" type="button" value="login"/>
+        </form>
+    </body>
+</html> 
