@@ -7,3 +7,6 @@
 [submodule "misultin"]
 	path = misultin
 	url = git://github.com/ostinelli/misultin.git
+[submodule "exmpp"]
+	path = exmpp
+	url = git://github.com/processone/exmpp.git
