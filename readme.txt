@@ -1,9 +1,15 @@
-Build and start
+Download jquery.json-2.2.js from
+http://code.google.com/p/jquery-json/
 
-$ erlc http_handler.erl xmpp_proxy.erl xmpp_proxy_sup.erl &&  erl -pa
-misultin/ebin/
+Build and run.
 
-Start:
-erl>xmpp_proxy_sup:start().
-erl>http_handler:start().
+
+Buid:
+$ erlc http_handler.erl xmpp_proxy.erl xmpp_proxy_sup.erl sessions.erl wijet_sup.erl &&  erl -pa misultin/ebin/ erlang-rfc4627/ebin/
+
+Run:
+erl>wijet_sup:start().
+
+
+
 

@@ -2,38 +2,90 @@
     <head>
         <title>File:index.html</title>
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.min.js"></script>
+        <script type="text/javascript" src="jquery-cookie/jquery.cookie.js"></script>
+        <script type="text/javascript" src="jquery.json-2.2.js"></script>
         <script type="text/javascript">
-            function misultinComet(){
-                auth = {jid: $('#jid').val(), password: $('#password').val()};
-                console.log(auth);
-                $.post('http://localhost:8080/login', auth, function(response){
+            function login(jabber_id, password){
+                request = { type: "login",
+                            data:   { jid: jabber_id,
+                                      pass: password
+                                    }
+                            }
+               console.log('login:');
+               console.log(request);
+                $.post('http://localhost:8080/login', $.toJSON(request), function(response){
                     console.log(response);
                     toDiv(response);
+                    updateCookieText();
                 });
+
+            }
+
+            function logout(){
+                request = { type: "logout"};
+                console.log('logout:');
+                console.log(request);
+                $.post('http://localhost:8080/login', $.toJSON(request), function(response){
+                    console.log(response);
+                    toDiv(response);
+                    updateCookieText();
+            });
+ 
             }
             
             function toDiv(content){
                     $('#content').append(content + '<br>');
             }
-            
+
+            function updateCookieText() {
+                console.log('updateCookieText.');
+                $('#cookie_value').val($.cookie('wijet'));
+            }
 
             $(document).ready(function() {
                 $('#login_btn').click(function() {
                         console.log('Login button click.');
-                        misultinComet();
+                        login($('#jid').val(), $('#password').val());
+                        updateCookieText();
+                });
+
+                $('#set_cookie_btn').click(function() {
+                    console.log('Set cookie button click.');
+                    $.cookie('wijet', $('#cookie_value').val());
+                });
+
+                $('#clear_cookie_btn').click(function(){
+                    console.log('Clear cookie button.');
+                    $.cookie('wijet', null);
+                     updateCookieText();
+                });
+
+                $('#logout_btn').click(function(){
+                    console.log('Log out button.');
+                    logout();
                 });
             });
         </script>
     </head>
     
     <body>
-        Long Polling example, please wait 10 seconds for incoming data.<br><br>
         <div id="content"></div>
 
         <form>
+            <!-- Login.  -->
             <span>jid: </span>        <input id="jid" type="text"> <br/>
             <span>password: </span>    <input id="password" type="text"> <br/>
             <input id="login_btn" type="button" value="login"/>
+            <br/>
+            <!-- Logout -->
+            <input id="logout_btn" type="button" value="logout"/>
+            <br/>
+
+            <!-- Cookies -->
+            <input id="set_cookie_btn" type="button" value="Set cookie"/>
+            <input id="cookie_value" type="text"/> <br/>
+
+            <input id="clear_cookie_btn" type="button" value="Clear cookie"/>
         </form>
     </body>
 </html> 
