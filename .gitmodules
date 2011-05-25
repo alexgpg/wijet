@@ -1,0 +1,9 @@
+[submodule "erlang-rfc4627"]
+	path = erlang-rfc4627
+	url = git://github.com/tonyg/erlang-rfc4627.git
+[submodule "jquery-cookie"]
+	path = jquery-cookie
+	url = git://github.com/carhartl/jquery-cookie.git
+[submodule "misultin"]
+	path = misultin
+	url = git://github.com/ostinelli/misultin.git

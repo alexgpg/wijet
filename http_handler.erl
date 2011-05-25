@@ -19,23 +19,71 @@ handle('GET', [], Req) ->
     Req:file("index.html");
 
 handle('POST', ["login"], Req) ->
-    io:format("headers:~n~p~n", [Req:get(headers)]),
-    io:format("parse_post:~n~p~n", [Req:parse_post()]),
+    Headers = Req:get(headers),
+    io:format("Headers:~n~p~n", [Headers]),
+    Post = Req:parse_post(),
+    io:format("Post:~n~p~n", [Post]),
+    Cookie = proplists:get_value('Cookie', Headers),
+    io:format("Cookie:~n~p~n", [Cookie]),
+
+    [{PostKey, _PostValue}] = Post,
+    io:format("PostKey:~n~p~n", [PostKey]),
+    ParsedJson = rfc4627:decode(PostKey),
+    io:format("ParsedJson:~n~p~n", [ParsedJson]),
     
-    [{"jid", JidString},{"password", Pass}] = Req:parse_post(),
-    io:format("jid string:~n~p~n", [JidString]),
-    io:format("password:~n~p~n", [Pass]),
+    case ParsedJson of
+        {ok,{obj,[{"type",<<"login">>},
+              {"data",
+                {obj,[{"jid", Jid},
+                {"pass", Pass }]}}]}, [] } ->
+                    login(Req, Jid, Pass);
+        {ok,{obj,[{"type",<<"logout">>}]},[]} ->
+                    logout(Req, Cookie)
+    end;
 
-    xmpp_proxy:start_under_sup(JidString, Pass),
-
-    Req:ok("This is /login request");
-
+% Handling of static files
 handle('GET', [Filename], Req) ->
+    io:format("GET: Filename:~n~p~n", [Filename]),
     Req:file(Filename);
 
+handle('GET', [Dir, Filename], Req) ->
+    io:format("GET: Filename2:~n~p/~p~n", [Dir, Filename]),
+    Req:file(Dir ++ "/" ++ Filename);
+
 % handle the 404 page not found
-handle(_, _, Req) ->
-    Req:ok([{"Content-Type", "text/plain"}], "Page not found."). % Not true. use code 404
-    
+handle(_, XZ, Req) ->
+    io:format("GET: XZ:~n~p~n", [XZ]),
+    Req:ok([{"Content-Type", "text/plain"}], "Page not found."). % FIXME: Not true. use code 404 code.
 
+% -----------------------------------------------------------------------------
+login(Req, Jid, Pass) ->
+    io:format("Jid:~n~p~n", [Jid]),
+    io:format("Pass:~n~p~n", [Pass]),
 
+    case xmpp_proxy:start_under_sup(Jid, Pass) of
+        {ok, XmppProxyPid } ->
+            {ok, NewCookie }  = sessions:new_session(XmppProxyPid),
+            NewHeaders = [{"Content-Type", "text/plain"}, {"Set-Cookie","wijet=" ++ NewCookie}],
+            Response =  rfc4627:encode({obj, [{"login", <<"ok">>}]}),
+            Req:respond(200, NewHeaders, Response);
+        _ ->
+            Response =  rfc4627:encode({obj, [{"login", <<"failed">>}]}),
+            Req:respond(200,  [{"Content-Type", "text/plain"}], Response)
+    end.
+ 
+ % ----------------------------------------------------------------------------
+logout(Req, Cookie) ->
+    % Parse cookie
+    % TODO: Use normal cookie parser.
+    "wijet=" ++ CookieValue = Cookie,
+    % exmple cookie: "wijet=/qV32FipwZ282SjtQaU/pg=="
+    io:format("CookieVal:~n~p~n", [CookieValue]),
+    case sessions:get_session(CookieValue) of
+        {ok, not_found} ->
+            Response = rfc4627:encode({obj, [{"logout", <<"not logged in">>}]});
+        {ok, XmppProxyPid} ->
+            xmpp_proxy:stop(XmppProxyPid),
+            sessions:delete_session(CookieValue),
+            Response = rfc4627:encode({obj, [{"logout", <<"ok">>}]})
+    end,
+    Req:respond(200,  [{"Content-Type", "text/plain"}], Response).
