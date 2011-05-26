@@ -13,7 +13,7 @@
                             }
                console.log('login:');
                console.log(request);
-                $.post('http://localhost:8080/login', $.toJSON(request), function(response){
+                $.post('login', $.toJSON(request), function(response){
                     console.log(response);
                     toDiv(response);
                     updateCookieText();
@@ -25,7 +25,7 @@
                 request = { type: "logout"};
                 console.log('logout:');
                 console.log(request);
-                $.post('http://localhost:8080/login', $.toJSON(request), function(response){
+                $.post('login', $.toJSON(request), function(response){
                     console.log(response);
                     toDiv(response);
                     updateCookieText();
