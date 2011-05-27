@@ -1,6 +1,6 @@
 -module(xmpp_proxy).
 
--export([start/2, start_under_sup/2, stop/1]).
+-export([start/2, start_under_sup/2, stop/1, push/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, 
     code_change/3, terminate/2]).
 
@@ -22,7 +22,11 @@ start_under_sup(JidStr, Password) ->
 % ----------------------------------------------------------------------------
 stop(Pid) ->
    gen_server:call(Pid, stop).
-    
+
+% -----------------------------------------------------------------------------
+push(Pid, XmppStr) ->
+    gen_server:call(Pid, {push, XmppStr}).
+
 % -----------------------------------------------------------------------------
 % Callbacks
 % -----------------------------------------------------------------------------
@@ -44,6 +48,14 @@ init([JidStr, Password]) ->
 handle_call(stop, _From, State) ->
     {stop, normal, {ok, stopped}, State};    
 
+handle_call({push, XmppStr}, _From, {state, Session} = State) ->
+    [Packet] = exmpp_xml:parse_document(XmppStr),
+
+    %[Packet] = exmpp_xml:parse_document("<message to='alexgpg@ya.ru' type='chat' xmlns='jabber:client'><body>textextext</body></message>"),
+    io:format("[xmpp_proxy][push]Packet:~n~p~n", [Packet]),
+    exmpp_session:send_packet(Session, Packet),
+    {reply, ok, State};
+
 handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 
@@ -53,7 +65,7 @@ handle_cast(_Request, State) ->
 
 % -----------------------------------------------------------------------------
 handle_info(XmppMsg = #received_packet{}, State) ->
-        %io:format("New received_packet ~p~n", [XmppMsg]), % DEBUG
+        %%io:format("[xmpp_proxy] New received_packet:~n~p~n", [XmppMsg]), % DEBUG
         {noreply, State};
 
 handle_info(_Info, State) ->

@@ -10,3 +10,6 @@
 [submodule "exmpp"]
 	path = exmpp
 	url = git://github.com/processone/exmpp.git
+[submodule "strophejs"]
+	path = strophejs
+	url = git://github.com/metajack/strophejs.git

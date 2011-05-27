@@ -4,6 +4,9 @@
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.min.js"></script>
         <script type="text/javascript" src="jquery-cookie/jquery.cookie.js"></script>
         <script type="text/javascript" src="jquery.json-2.2.js"></script>
+        
+        <script type="text/javascript" src="strophejs/src/core.js"></script>
+        
         <script type="text/javascript">
             function login(jabber_id, password){
                 request = { type: "login",
@@ -64,6 +67,20 @@
                     console.log('Log out button.');
                     logout();
                 });
+
+                // -----------------------------------------------------------------------------------
+                $('#send_msg_btn').click(function() {
+                    var to = $('#to').val();
+                    var text = $('#msg_body').val();
+                    var msg = $msg({to: to, type: 'chat'}).c('body', {}).t(text);
+                    console.log('[#send_msg_btn][click] msg:' + msg.toString());
+                    $.post('xmpp', { body:msg.toString()}, function(response){
+                        console.log('[#send_msg_btn][click] response:');
+                        console.log(response);
+                        toDiv(response);
+                        updateCookieText();
+                    });
+                });
             });
         </script>
     </head>
@@ -86,6 +103,13 @@
             <input id="cookie_value" type="text"/> <br/>
 
             <input id="clear_cookie_btn" type="button" value="Clear cookie"/>
+            <br/>
+            <br/>
+            <p>To:</p>
+            <input id="to" type="text"/>
+            <p>Message body</p>
+            <input id="msg_body" type="text"/> <br/>
+            <input id="send_msg_btn" type="button" value="Send message"/>
         </form>
     </body>
 </html> 

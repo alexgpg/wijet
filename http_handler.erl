@@ -15,8 +15,18 @@ handle_http(Req) ->
     handle(Req:get(method), Req:resource([lowercase, urldecode]), Req).
 
 % handle a GET on /
-handle('GET', [], Req) -> 
+handle('GET', [], Req) ->  
     Req:file("index.html");
+
+handle('POST', ["xmpp"], Req) ->
+    Headers = Req:get(headers),
+    io:format("Headers:~n~p~n", [Headers]),
+    Post = Req:parse_post(),
+    io:format("Post:~n~p~n", [Post]),
+    Cookie = proplists:get_value('Cookie', Headers),
+    io:format("Cookie:~n~p~n", [Cookie]),
+    handle_xmpp(Post, Cookie, Req);
+    
 
 handle('POST', ["login"], Req) ->
     Headers = Req:get(headers),
@@ -49,6 +59,10 @@ handle('GET', [Filename], Req) ->
 handle('GET', [Dir, Filename], Req) ->
     io:format("GET: Filename2:~n~p/~p~n", [Dir, Filename]),
     Req:file(Dir ++ "/" ++ Filename);
+
+handle('GET', [Dir, Subdir,Filename], Req) ->
+    io:format("GET: Filename3:~n~p/~p/~p~n", [Dir, Subdir,Filename]),
+    Req:file(Dir ++ "/" ++ Subdir ++ "/" ++ Filename);
 
 % handle the 404 page not found
 handle(_, XZ, Req) ->
@@ -85,5 +99,23 @@ logout(Req, Cookie) ->
             xmpp_proxy:stop(XmppProxyPid),
             sessions:delete_session(CookieValue),
             Response = rfc4627:encode({obj, [{"logout", <<"ok">>}]})
+    end,
+    Req:respond(200,  [{"Content-Type", "text/plain"}], Response).
+
+% -----------------------------------------------------------------------------
+handle_xmpp(Post, Cookie, Req) ->
+    [{"body" , PostBody}] = Post,
+    io:format("handle_xmpp: PostBody:~n~p~n", [PostBody]),
+
+    % Parse cookie
+    % TODO:  Use normal cookie parser.
+    "wijet=" ++ CookieValue = Cookie,
+
+    case sessions:get_session(CookieValue) of
+        {ok, not_found} ->
+            Response = "handle_xmpp: not_found";
+        {ok, XmppProxyPid} ->
+            xmpp_proxy:push(XmppProxyPid, PostBody),
+            Response = "handle_xmpp: pushed"
     end,
     Req:respond(200,  [{"Content-Type", "text/plain"}], Response).
