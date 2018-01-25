@@ -1,53 +1,34 @@
 require 'fcgi'
 require '../works/parser'
-require '../works/executer_request'
+# require '../works/executer_request'
+
+require '../works/executer'
 
 class FastCGIPoint
 	def initialize
 		@parser=Parser.new
 	
+		# main loop
 		FCGI.each do |request|
-# 			begin
+			begin
 				stuff=request.in.read
 				out = request.out
 
-# 				p 'aaaaaaaaaaaa'
-				
    				parsed=@parser.parse(stuff)
 
-# 				begin
-					@answer=ExecuterRequest.instance.execute(parsed)
-# 				rescue
-# 					@answer=JsonObject.loginFailed("111");
-					out << "Content-Type: text/html\n\n"
-# 					out << @parser.toJsonForLogin(@answer)
-# 					request.finish
-# 					return
-# 					
-# 				end
+				@answer=ExecuterRequest.instance.execute(parsed)
 
-# 				out.print "Content-Type: text/html\r\n\r\nHello, World!\n"
-#  				out << "Content-Type: text/html\r\n\r\n"
-#  				out << @parser.toJsonForLogin(res)
-# 				out << stuff
+				out << "Content-Type: text/html\n\n"
+				out << @parser.toJson(@answer)
 
-#  				out << "Content-Type: text/html\n\n"
-
-				out << @parser.toJsonForLogin(@answer)
-
-# 				out << "parsed: '" + parsed.data.inspect + "'\n"
-# 				
-# 				out << "\n\n\n"
-# 				out << @answer.inspect
-#  				out << "\n\n\n"
-# 				out << @parser.toJsonForLogin(answer)
-				
 				request.finish
-# 			rescue
-# 				out << "Content-Type: text/html\r\n\r\n"
-# 				out << "atatat"
-# 				request.finish
-# 			end
+			rescue Exception => e
+				dbgPrn 2, 'Exception in FastCGIPoint each, ' + e.to_s
+				out << "Content-Type: text/html\n\n"
+				out << '{"Error":"bad request"}'
+				request.finish
+			end
+
 		end
 	end
 

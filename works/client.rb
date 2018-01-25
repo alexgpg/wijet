@@ -1,6 +1,5 @@
 require '../works/auth_info'
 require '../works/jabber_client'
-require '../works/executer_request'
 
 class Client
 	def initialize(a_hashArgs={})
@@ -14,11 +13,6 @@ class Client
 		@jabberClient.connect
 	end
 
-	def runRequest(a_parsedRequest)
-# 		p 'Client.runRequest'
-		ExecuterRequest.instance.run(a_parsedRequest,@jabberClient)
-	end
-	
 	def jabberClient
 # 		p 'Client.jabberClient'
 		return @jabberClient

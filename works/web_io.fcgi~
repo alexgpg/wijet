@@ -1,6 +1,7 @@
 #!/usr/bin/ruby1.8
 
 require '../works/fast_cgi_point'
+require '../works/debug'
 
 fcgi=FastCGIPoint.new
 

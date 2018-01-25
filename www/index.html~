@@ -42,8 +42,8 @@
 
     /// various debug variables
 
-    var DEBUGMODE = false;
-    var OFFLINEMODE = false;
+    var DEBUGMODE = true;
+    var OFFLINEMODE = true;
 
     var debug = function(str) {
       if (DEBUGMODE)

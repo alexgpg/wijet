@@ -12,8 +12,11 @@ class JsonObject
 	end
 	
 	def server
-		#todo: убрать эту херь
-		return "81.91.180.150"
+		if @data[2].nil?
+			return nil
+		end
+		#todo: add check on ip or domain name server
+		return @data[2]
 	end
 
 	def pass
